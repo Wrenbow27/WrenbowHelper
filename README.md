@@ -2,7 +2,8 @@
 Just some stuff that I need for mapping
 Warning: Probably Jank :3
 
-~Technical Details~
+-Technical Details-
+
 Dream block lift speed fix:
 Fixes the oversight of dream blocks not giving liftspeed when the player moves both into and out of them within a single frame.
 This occurs most notably with moving reverse dream blocks
@@ -19,7 +20,8 @@ Set LiftSpeed trigger:
 Overides normal liftspeed inheritence with a custom value
 Very silly
 
-~Credits~
+-Credits-
+
 Chronia Helper - moreOptions lua code
 
 Extended Variants Mode - adapted Jump Refill textures
