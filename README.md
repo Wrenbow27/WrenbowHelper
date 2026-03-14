@@ -1,6 +1,6 @@
 # WrenbowHelper
 Just some stuff that I need for mapping
-Warning: Probably Jank :3
+Warning: Probably jank :3
 
 -Technical Details-
 
@@ -17,8 +17,7 @@ Requested by jantheguy
 A refill that can also be collected by holdables
 
 Set LiftSpeed trigger:
-Overides normal liftspeed inheritence with a custom value
-Very silly
+Overides normal liftspeed inheritence with a custom value (very silly)
 
 -Credits-
 
