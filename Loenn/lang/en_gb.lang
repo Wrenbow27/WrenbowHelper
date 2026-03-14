@@ -1,0 +1,32 @@
+# Bluetooth Refill
+entities.WrenbowHelper/BluetoothRefill.placements.name.bluetooth_refill=Bluetooth Refill
+entities.WrenbowHelper/BluetoothRefill.placements.description.bluetooth_refill=Refill crystal that can be collected by holdables
+entities.WrenbowHelper/BluetoothRefill.attributes.description.spritePath=Path to a custom sprite folder from Gameplay/. (Expected to contain at least an idle00, flash00, and outline)
+entities.WrenbowHelper/BluetoothRefill.attributes.description.spriteColor=Tint color
+entities.WrenbowHelper/BluetoothRefill.attributes.description.respawnTime=Time to respawn in seconds
+entities.WrenbowHelper/BluetoothRefill.attributes.description.freezeFrames=Number of freeze frames to apply on collect
+entities.WrenbowHelper/BluetoothRefill.attributes.description.collectSound=Sound event to play on collect
+entities.WrenbowHelper/BluetoothRefill.attributes.description.playerCollect=Whether this refill can be collected by the player
+entities.WrenbowHelper/BluetoothRefill.attributes.description.holdableCollect=Whether this refill can be collected by holdables (I don't know why you would ever turn this off)
+entities.WrenbowHelper/BluetoothRefill.attributes.description.overrideRequirements=If enabled, will be collected regardless of the player's current dash count or stamina
+entities.WrenbowHelper/BluetoothRefill.attributes.description.oneUse=Disables respawning
+entities.WrenbowHelper/BluetoothRefill.attributes.description.moreOptions=Shows advanced options (reload this dialog box to see them)
+
+# Dream Jump Refill
+entities.WrenbowHelper/DreamJumpRefill.placements.name.dream_jump_refill=Dream Jump Refill (WIP)
+entities.WrenbowHelper/DreamJumpRefill.placements.description.dream_jump_refill=Allows for a second non-buffered dream jump (i.e. dtj)
+entities.WrenbowHelper/DreamJumpRefill.attributes.description.persistent=Allows the 
+
+# Set LiftSpeed Trigger
+triggers.WrenbowHelper/SetLiftSpeedTrigger.placements.name.set_liftspeed_trigger=Set LiftSpeed Trigger
+triggers.WrenbowHelper/SetLiftSpeedTrigger.placements.description.set_liftspeed_trigger=Forcibly sets  the player's LiftSpeed (to be used for LiftBoost)
+triggers.WrenbowHelper/SetLiftSpeedTrigger.attributes.description.liftSpeedX=Horizontal LiftSpeed to give (note: LiftBoost usually capped to +-250)
+triggers.WrenbowHelper/SetLiftSpeedTrigger.attributes.description.liftSpeedY=Vertical LiftSpeed to give (note: LiftBoost usually capped to 0,-130)
+triggers.WrenbowHelper/SetLiftSpeedTrigger.attributes.description.onlyOnce=Removes the trigger when LiftSpeed is first given
+triggers.WrenbowHelper/SetLiftSpeedTrigger.attributes.description.sustainedOverride=Prevents other sources' liftspeed from applying until the overridden value runs out 
+triggers.WrenbowHelper/SetLiftSpeedTrigger.attributes.description.flag=Flag that must be true to give LiftSpeed
+
+# Dream Block LiftSpeed Fix Trigger
+triggers.WrenbowHelper/DreamBlockLiftSpeedFixTrigger.placements.name.dream_block_liftspeed_fix_trigger=Dream Block LiftSpeed Fix Trigger
+triggers.WrenbowHelper/DreamBlockLiftSpeedFixTrigger.placements.description.dream_block_liftspeed_fix_trigger=Enables dream block liftspeed fix (gives the dream block's liftspeed when entering stDreamDash)
+triggers.WrenbowHelper/DreamBlockLiftSpeedFixTrigger.attributes.description.value=Whether the fix will be active
