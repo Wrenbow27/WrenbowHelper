@@ -10,7 +10,7 @@ This occurs most notably with moving reverse dream blocks
 
 Dream jump refill:
 Allows for a second non-buffered dream jump i.e. dtjs.
-This works by refunding the coyote time of a jump/hyper/super if it was done using the dream block's coyote time.
+This works by refunding the coyote time of a jump/hyper/super if it was done using the dream block's coyote time. While a dream jump is "stored" like this, the flag WrenbowHelper_HasDreamJump is held as true.
 
 Bluetooth refill:
 Requested by jantheguy
