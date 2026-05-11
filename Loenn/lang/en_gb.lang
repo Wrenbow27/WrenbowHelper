@@ -7,9 +7,9 @@ entities.WrenbowHelper/BluetoothRefill.attributes.description.respawnTime=Time t
 entities.WrenbowHelper/BluetoothRefill.attributes.description.freezeFrames=Number of freeze frames to apply on collect
 entities.WrenbowHelper/BluetoothRefill.attributes.description.collectSound=Sound event to play on collect
 entities.WrenbowHelper/BluetoothRefill.attributes.description.playerCollect=Whether this refill can be collected by the player
-entities.WrenbowHelper/BluetoothRefill.attributes.description.holdableCollect=Whether this refill can be collected by holdables (I don't know why you would ever turn this off)
-entities.WrenbowHelper/BluetoothRefill.attributes.description.overrideRequirements=If enabled, will be collected regardless of the player's current dash count or stamina
-entities.WrenbowHelper/BluetoothRefill.attributes.description.oneUse=Disables respawning
+entities.WrenbowHelper/BluetoothRefill.attributes.description.triggerViaDashCount=Whether the refill can be collected due to the player not being at max dashes
+entities.WrenbowHelper/BluetoothRefill.attributes.description.triggerViaStamina=Whether the refill can be collected due to the player being at low stamina
+entities.WrenbowHelper/BluetoothRefill.attributes.description.triggerAlways=If enabled, will be collected regardless of the player's current dash count or stamina. Overrides the other trigger settings
 entities.WrenbowHelper/BluetoothRefill.attributes.description.moreOptions=Shows advanced options (reload this dialog box to see them)
 
 # Dream Jump Refill

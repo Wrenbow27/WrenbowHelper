@@ -17,8 +17,11 @@ public class BluetoothRefill : Entity {
     private readonly float freeze;
     private readonly string collectSound;
     private readonly bool playerCollect;
-    private readonly bool holdableCollect;
-    private readonly bool overrideRequirements;
+    private readonly bool triggerViaDashCount;
+    private readonly bool triggerViaStamina;
+    private readonly bool triggerAlways;
+    private readonly bool refillDashes;
+    private readonly bool RefillStamina;
     private readonly bool oneUse;
     private readonly bool twoDashes;
 
@@ -70,8 +73,11 @@ public class BluetoothRefill : Entity {
         freeze = data.Int("freezeFrames", 3)/60f;
         collectSound = data.Attr("collectSound", "event:/game/general/diamond_touch");
         playerCollect = data.Bool("playerCollect", true);
-        holdableCollect = data.Bool("holdableCollect", false);
-        overrideRequirements = data.Bool("overrideRequirements", false);
+        triggerViaDashCount = data.Bool("triggerViaDashCount", false);
+        triggerViaStamina = data.Bool("triggerViaStamina", false);
+        triggerAlways = data.Bool("triggerAlways", false);
+        refillDashes = data.Bool("refillDashes", true);
+        RefillStamina = data.Bool("refillStamina", true);
         oneUse = data.Bool("oneUse", false);
         twoDashes = data.Bool("twoDashes", false);
         string text;
@@ -81,10 +87,7 @@ public class BluetoothRefill : Entity {
         {
             Add(new PlayerCollider(OnPlayer));
         }
-        if (holdableCollect)
-        {
-            Add(new HoldableCollider(OnHoldable));
-        }
+        Add(new HoldableCollider(OnHoldable));
 
         if (twoDashes)
         {
@@ -208,7 +211,7 @@ public class BluetoothRefill : Entity {
 
     public void OnPlayer(Player player)
     {
-        if (player.UseRefill(twoDashes) || overrideRequirements)
+        if (UseRefill(twoDashes, player))
         {
             Audio.Play(collectSound, Position);
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
@@ -224,7 +227,7 @@ public class BluetoothRefill : Entity {
         if (player == null) 
             return;
 
-        if (player.UseRefill(twoDashes) || overrideRequirements)
+        if (UseRefill(twoDashes, player))
         {
             Audio.Play(collectSound, Position);
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
@@ -233,6 +236,23 @@ public class BluetoothRefill : Entity {
             respawnTimer = respawnTime;
         }
     }
+
+    private bool UseRefill (bool twoDashes, Player player)
+	{
+		int num = player.MaxDashes;
+		if (twoDashes) {
+			num = 2;
+		}
+        if (triggerAlways || (player.Dashes < num && triggerViaDashCount) || (player.Stamina < 20f && triggerViaStamina))
+        {
+            if (refillDashes)
+                player.Dashes = num;
+            if (RefillStamina)
+                player.RefillStamina();
+            return true;
+		}
+		return false;
+	}
 
     public IEnumerator RefillRoutine(Player player)
     {

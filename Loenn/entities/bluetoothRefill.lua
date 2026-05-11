@@ -7,7 +7,9 @@ local function ignoreAttr(entity)
         "respawnTime",
         "freezeFrames",
         "collectSound",
-        "overrideRequirements"
+        "triggerAlways",
+        "refillDashes",
+        "refillStamina"
     }
 
     if not entity.moreOptions then
@@ -26,18 +28,20 @@ local bluetoothRefill = {
     {
         name = "bluetooth_refill",
         data = {
-            playerCollect = false,
-            holdableCollect = true,
-            oneUse = false,
-            twoDashes = false,
-            moreOptions = false,
-
             spritePath = "",
             spriteColor = "ffffff",
             respawnTime = 2.5,
             freezeFrames = 3,
             collectSound = "event:/game/general/diamond_touch",
-            overrideRequirements = false
+            playerCollect = false,
+            triggerViaDashCount = true,
+            triggerViaStamina = true,
+            triggerAlways = false,
+            refillDashes = true,
+            refillStamina = true,
+            oneUse = false,
+            twoDashes = false,
+            moreOptions = false
             }
         }
     },
@@ -74,8 +78,11 @@ local bluetoothRefill = {
         "freezeFrames",
         "collectSound",
         "playerCollect",
-        "holdableCollect",
-        "overrideRequirements",
+        "triggerViaDashCount",
+        "triggerViaStamina",
+        "triggerAlways",
+        "refillDashes",
+        "refillStamina",
         "oneUse",
         "twoDashes",
         "moreOptions"        
