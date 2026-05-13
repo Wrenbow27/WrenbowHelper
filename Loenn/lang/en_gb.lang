@@ -13,7 +13,7 @@ entities.WrenbowHelper/BluetoothRefill.attributes.description.triggerAlways=If e
 entities.WrenbowHelper/BluetoothRefill.attributes.description.moreOptions=Shows advanced options (reload this dialog box to see them)
 
 # Dream Jump Refill
-entities.WrenbowHelper/DreamJumpRefill.placements.name.dream_jump_refill=Dream Jump Refill (WIP)
+entities.WrenbowHelper/DreamJumpRefill.placements.name.dream_jump_refill=Dream Jump Refill
 entities.WrenbowHelper/DreamJumpRefill.placements.description.dream_jump_refill=Allows for a second non-buffered dream jump (i.e. dtj)
 entities.WrenbowHelper/DreamJumpRefill.attributes.description.persistent=Allows the 
 

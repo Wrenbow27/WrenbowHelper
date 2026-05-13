@@ -12,7 +12,11 @@ namespace Celeste.Mod.WrenbowHelper.Entities;
 public class DreamJumpRefill : Entity {
     //lonn declared
     private readonly bool oneUse;
+    private readonly int earlyLeniencyFrames;
+    private readonly int lateLeniencyFrames;
     private readonly bool persistent;
+    private readonly bool trailIndicator;
+    private readonly Color trailColor;
 
     //copied from vanilla
     private static readonly ParticleType P_Shatter = Refill.P_Shatter;
@@ -47,7 +51,11 @@ public class DreamJumpRefill : Entity {
         : base(data.Position + offset)
     {
         oneUse = data.Bool("oneUse", false);
+        earlyLeniencyFrames = data.Int("earlyLeniencyFrames", 0);
+        lateLeniencyFrames = data.Int("lateLeniencyFrames", 0);
         persistent = data.Bool("persistent", true);
+        trailIndicator = data.Bool("trailIndicator", true);
+        trailColor = data.HexColor("trailColor", Calc.HexToColor("c81ec8"));
 
         Collider = new Hitbox(16f, 16f, -8f, -8f);
         Add(new PlayerCollider(OnPlayer));
@@ -153,7 +161,13 @@ public class DreamJumpRefill : Entity {
 
     public void OnPlayer(Player player)
     {
-        if (ExtraDreamJump.GiveDreamJump(player, persistent)) // <= return whether collected after check
+        if (ExtraDreamJump.GiveDreamJump(
+            player,
+            earlyLeniencyFrames,
+            lateLeniencyFrames,
+            persistent,
+            trailIndicator,
+            trailColor)) // <= return whether collected after check
         {
             Audio.Play("event:/game/general/diamond_touch", Position);
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
