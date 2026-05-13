@@ -6,7 +6,7 @@ entities.WrenbowHelper/BluetoothRefill.attributes.description.spriteColor=Tint c
 entities.WrenbowHelper/BluetoothRefill.attributes.description.respawnTime=Time to respawn in seconds
 entities.WrenbowHelper/BluetoothRefill.attributes.description.freezeFrames=Number of freeze frames to apply on collect
 entities.WrenbowHelper/BluetoothRefill.attributes.description.collectSound=Sound event to play on collect
-entities.WrenbowHelper/BluetoothRefill.attributes.description.playerCollect=Whether this refill can be collected by the player
+entities.WrenbowHelper/BluetoothRefill.attributes.description.playerCollect=Whether this refill can also be collected by the player
 entities.WrenbowHelper/BluetoothRefill.attributes.description.triggerViaDashCount=Whether the refill can be collected due to the player not being at max dashes
 entities.WrenbowHelper/BluetoothRefill.attributes.description.triggerViaStamina=Whether the refill can be collected due to the player being at low stamina
 entities.WrenbowHelper/BluetoothRefill.attributes.description.triggerAlways=If enabled, will be collected regardless of the player's current dash count or stamina. Overrides the other trigger settings
@@ -15,7 +15,11 @@ entities.WrenbowHelper/BluetoothRefill.attributes.description.moreOptions=Shows 
 # Dream Jump Refill
 entities.WrenbowHelper/DreamJumpRefill.placements.name.dream_jump_refill=Dream Jump Refill
 entities.WrenbowHelper/DreamJumpRefill.placements.description.dream_jump_refill=Allows for a second non-buffered dream jump (i.e. dtj)
-entities.WrenbowHelper/DreamJumpRefill.attributes.description.persistent=Allows the 
+entities.WrenbowHelper/DreamJumpRefill.attributes.description.earlyLeniencyFrames=Extra leniency coyote frames to be applied on dream block exit. These can carry over to a second non-buffered jump
+entities.WrenbowHelper/DreamJumpRefill.attributes.description.lateLeniencyFrames=Extra leniency coyote frames to be applied after the first non-buffered jump
+entities.WrenbowHelper/DreamJumpRefill.attributes.description.persistent=Allows the stored jump to be retained past the next dream block exit if not used
+entities.WrenbowHelper/DreamJumpRefill.attributes.description.trailIndicator=Whether to show a trail when a dream jump is either stored or usable. If custom indication is desired, the flag "WrenbowHelper_HasDreamJump" follows this behavior
+entities.WrenbowHelper/DreamJumpRefill.attributes.description.trailColor=Color of the indicator trail
 
 # Set LiftSpeed Trigger
 triggers.WrenbowHelper/SetLiftSpeedTrigger.placements.name.set_liftspeed_trigger=Set LiftSpeed Trigger
