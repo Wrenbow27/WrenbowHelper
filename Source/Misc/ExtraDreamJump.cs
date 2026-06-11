@@ -70,37 +70,38 @@ namespace Celeste.Mod.WrenbowHelper {
             orig(player);
             
             if (WrenbowHelperModule.Session.DreamBlockGraceTime > 0f)
+            {
+                WrenbowHelperModule.Session.DreamBlockGraceTime -= Engine.DeltaTime;
+            }
+            else if (WrenbowHelperModule.Session.CanDreamJump)
+            {
+                WrenbowHelperModule.Session.CanDreamJump = false;
+                if (!WrenbowHelperModule.Session.Persistent)
                 {
-                    WrenbowHelperModule.Session.DreamBlockGraceTime -= Engine.DeltaTime;
+                    WrenbowHelperModule.Session.HasDreamJump = false;
+                    FlagUpdate(player);
                 }
-                else if (WrenbowHelperModule.Session.CanDreamJump)
-                {
-                    WrenbowHelperModule.Session.CanDreamJump = false;
-                    if (!WrenbowHelperModule.Session.Persistent)
-                    {
-                        WrenbowHelperModule.Session.HasDreamJump = false;
-                        FlagUpdate(player);
-                    }
-                }
+            }
 
-                if (player.onGround && WrenbowHelperModule.Session.CanDreamJump)
+            if (player.onGround && WrenbowHelperModule.Session.CanDreamJump)
+            {
+                WrenbowHelperModule.Session.CanDreamJump = false;
+                if (!WrenbowHelperModule.Session.Persistent)
                 {
-                    WrenbowHelperModule.Session.CanDreamJump = false;
-                    if (!WrenbowHelperModule.Session.Persistent)
-                    {
-                        WrenbowHelperModule.Session.HasDreamJump = false;
-                        FlagUpdate(player);
-                    }
+                WrenbowHelperModule.Session.HasDreamJump = false;
+                WrenbowHelperModule.Session.DreamBlockGraceTime = 0f;
+                FlagUpdate(player);
                 }
+            }
 
-                if ((WrenbowHelperModule.Session.HasDreamJump || WrenbowHelperModule.Session.CanDreamJump) && player.Scene.OnInterval(0.1f))
-                {
-                    Vector2 scale = new(
-                        Math.Abs(player.Sprite.Scale.X),
-                        player.Sprite.Scale.Y
-                    );
-                    TrailManager.Add(player, scale, WrenbowHelperModule.Session.TrailColor);
-                }
+            if ((WrenbowHelperModule.Session.HasDreamJump || WrenbowHelperModule.Session.CanDreamJump) && player.Scene.OnInterval(0.1f))
+            {
+                Vector2 scale = new(
+                    Math.Abs(player.Sprite.Scale.X)*0.8f,
+                    player.Sprite.Scale.Y*0.8f
+                );
+                TrailManager.Add(player, scale, WrenbowHelperModule.Session.TrailColor);
+            }
         }
         private static void Player_DreamDashEnd(On.Celeste.Player.orig_DreamDashEnd orig, Player player)
         {
