@@ -22,7 +22,6 @@ namespace Celeste.Mod.WrenbowHelper {
             On.Celeste.Player.Update += Player_Update;
             On.Celeste.Player.Jump += Player_Jump;
             On.Celeste.Player.SuperJump += Player_SuperJump;
-            On.Celeste.Player.SuperWallJump += Player_SuperWallJump;
             On.Celeste.Player.Added += Player_Added;
 
             hooked = true;
@@ -39,7 +38,6 @@ namespace Celeste.Mod.WrenbowHelper {
             On.Celeste.Player.Update -= Player_Update;
             On.Celeste.Player.Jump -= Player_Jump;
             On.Celeste.Player.SuperJump -= Player_SuperJump;
-            On.Celeste.Player.SuperWallJump -= Player_SuperWallJump;
             On.Celeste.Player.Added -= Player_Added;
 
             hooked = false;
@@ -102,7 +100,7 @@ namespace Celeste.Mod.WrenbowHelper {
                         player.Sprite.Scale.Y
                     );
                     TrailManager.Add(player, scale, WrenbowHelperModule.Session.TrailColor);
-                }          
+                }
         }
         private static void Player_DreamDashEnd(On.Celeste.Player.orig_DreamDashEnd orig, Player player)
         {
@@ -132,11 +130,7 @@ namespace Celeste.Mod.WrenbowHelper {
             orig(player);
             RefundCoyote(player);
         }
-        private static void Player_SuperWallJump(On.Celeste.Player.orig_SuperWallJump orig, Player player, int dir)
-        {
-            orig(player, dir);
-            RefundCoyote(player);
-        }
+
         private static void FlagUpdate(Player player)
         {
             Level level = player.SceneAs<Level>();
@@ -163,6 +157,8 @@ namespace Celeste.Mod.WrenbowHelper {
             {
                 level?.Session.SetFlag(flag, false);
             }
+            WrenbowHelperModule.Session.HasDreamJump = false;
+            WrenbowHelperModule.Session.CanDreamJump = false;
         }
     }
 }
