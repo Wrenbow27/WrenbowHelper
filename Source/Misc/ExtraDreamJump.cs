@@ -11,19 +11,6 @@ namespace Celeste.Mod.WrenbowHelper {
         private static bool hooked;
         private const string flag = "WrenbowHelper_HasDreamJump";
 
-        private class WrenbowStoredDreamJump {
-            public bool HasDreamJump = false;
-            public bool CanDreamJump = false;
-            public float DreamBlockGraceTime = 0f;
-            public int EarlyLeniencyFrames = 0;
-            public int LateLeniencyFrames = 0;
-            public bool Persistent = false;
-            public bool TrailIndicator = false;
-            public Color TrailColor = Calc.HexToColor("c81ec8");
-        }
-
-        private static readonly ConditionalWeakTable<Player, WrenbowStoredDreamJump> wrenbowStoredDreamJump = new ConditionalWeakTable<Player, WrenbowStoredDreamJump>();
-
         public static void Load()
         {
             if (hooked)
@@ -66,16 +53,15 @@ namespace Celeste.Mod.WrenbowHelper {
             bool trailIndicator,
             Color trailColor)
         {
-            WrenbowStoredDreamJump data = wrenbowStoredDreamJump.GetOrCreateValue(player);
-            if (!data.HasDreamJump)
+            if (!WrenbowHelperModule.Session.HasDreamJump) 
             {
-                data.HasDreamJump = true;
-                data.EarlyLeniencyFrames = earlyLeniencyFrames;
-                data.LateLeniencyFrames = lateLeniencyFrames;
-                data.Persistent = persistent;
-                data.TrailIndicator = trailIndicator;
-                data.TrailColor = trailColor;
-                FlagUpdate(player, data);
+                WrenbowHelperModule.Session.HasDreamJump = true;
+                WrenbowHelperModule.Session.EarlyLeniencyFrames = earlyLeniencyFrames;
+                WrenbowHelperModule.Session.LateLeniencyFrames = lateLeniencyFrames;
+                WrenbowHelperModule.Session.Persistent = persistent;
+                WrenbowHelperModule.Session.TrailIndicator = trailIndicator;
+                WrenbowHelperModule.Session.TrailColor = trailColor;
+                FlagUpdate(player);
                 return true;
             }
             return false;
@@ -85,59 +71,51 @@ namespace Celeste.Mod.WrenbowHelper {
         {
             orig(player);
             
-            if (wrenbowStoredDreamJump.TryGetValue(player, out var data))
-            {
-                if (data.DreamBlockGraceTime > 0f)
+            if (WrenbowHelperModule.Session.DreamBlockGraceTime > 0f)
                 {
-                    data.DreamBlockGraceTime -= Engine.DeltaTime;
+                    WrenbowHelperModule.Session.DreamBlockGraceTime -= Engine.DeltaTime;
                 }
-                else if (data.CanDreamJump)
+                else if (WrenbowHelperModule.Session.CanDreamJump)
                 {
-                    data.CanDreamJump = false;
-                    if (!data.Persistent)
+                    WrenbowHelperModule.Session.CanDreamJump = false;
+                    if (!WrenbowHelperModule.Session.Persistent)
                     {
-                        data.HasDreamJump = false;
-                        FlagUpdate(player, data);
+                        WrenbowHelperModule.Session.HasDreamJump = false;
+                        FlagUpdate(player);
                     }
                 }
 
-                if (player.onGround && data.CanDreamJump)
+                if (player.onGround && WrenbowHelperModule.Session.CanDreamJump)
                 {
-                    data.CanDreamJump = false;
-                    if (!data.Persistent)
+                    WrenbowHelperModule.Session.CanDreamJump = false;
+                    if (!WrenbowHelperModule.Session.Persistent)
                     {
-                        data.HasDreamJump = false;
-                        FlagUpdate(player, data);
+                        WrenbowHelperModule.Session.HasDreamJump = false;
+                        FlagUpdate(player);
                     }
                 }
 
-                if ((data.HasDreamJump || data.CanDreamJump) && player.Scene.OnInterval(0.1f))
+                if ((WrenbowHelperModule.Session.HasDreamJump || WrenbowHelperModule.Session.CanDreamJump) && player.Scene.OnInterval(0.1f))
                 {
                     Vector2 scale = new(
                         Math.Abs(player.Sprite.Scale.X),
                         player.Sprite.Scale.Y
                     );
-                    TrailManager.Add(player, scale, data.TrailColor);
-                }
-
-            }            
+                    TrailManager.Add(player, scale, WrenbowHelperModule.Session.TrailColor);
+                }          
         }
         private static void Player_DreamDashEnd(On.Celeste.Player.orig_DreamDashEnd orig, Player player)
         {
             orig(player);
-            if (!wrenbowStoredDreamJump.TryGetValue(player, out var data))
+            if (WrenbowHelperModule.Session.HasDreamJump)
             {
-                return;
-            }
-            if (data.HasDreamJump)
-            {
-                player.jumpGraceTimer += data.EarlyLeniencyFrames * Engine.DeltaTime;
-                data.DreamBlockGraceTime = player.jumpGraceTimer;
-                data.CanDreamJump = true;
-                if (!data.Persistent)
+                player.jumpGraceTimer += WrenbowHelperModule.Session.EarlyLeniencyFrames * Engine.DeltaTime;
+                WrenbowHelperModule.Session.DreamBlockGraceTime = player.jumpGraceTimer;
+                WrenbowHelperModule.Session.CanDreamJump = true;
+                if (!WrenbowHelperModule.Session.Persistent)
                 {
-                    data.HasDreamJump = false;
-                    FlagUpdate(player, data);
+                    WrenbowHelperModule.Session.HasDreamJump = false;
+                    FlagUpdate(player);
                 }
             }
         }
@@ -159,24 +137,20 @@ namespace Celeste.Mod.WrenbowHelper {
             orig(player, dir);
             RefundCoyote(player);
         }
-        private static void FlagUpdate(Player player, WrenbowStoredDreamJump data)
+        private static void FlagUpdate(Player player)
         {
             Level level = player.SceneAs<Level>();
-            level?.Session.SetFlag(flag, data.HasDreamJump || data.CanDreamJump);
+            level?.Session.SetFlag(flag, WrenbowHelperModule.Session.HasDreamJump || WrenbowHelperModule.Session.CanDreamJump);
         }
         private static void RefundCoyote(Player player)
         {
-            if (!wrenbowStoredDreamJump.TryGetValue(player, out var data))
+            if (WrenbowHelperModule.Session.CanDreamJump && WrenbowHelperModule.Session.DreamBlockGraceTime > 0f)
             {
-                return;
-            }
-            if (data.CanDreamJump && data.DreamBlockGraceTime > 0f)
-            {
-                player.jumpGraceTimer = data.DreamBlockGraceTime + data.LateLeniencyFrames * Engine.DeltaTime;
-                data.DreamBlockGraceTime = 0f;
-                data.HasDreamJump = false;
-                data.CanDreamJump = false;
-                FlagUpdate(player, data);
+                player.jumpGraceTimer = WrenbowHelperModule.Session.DreamBlockGraceTime + WrenbowHelperModule.Session.LateLeniencyFrames * Engine.DeltaTime;
+                WrenbowHelperModule.Session.DreamBlockGraceTime = 0f;
+                WrenbowHelperModule.Session.HasDreamJump = false;
+                WrenbowHelperModule.Session.CanDreamJump = false;
+                FlagUpdate(player);
 
                 Audio.Play("event:/game/general/diamond_return", player.Position);
             }
