@@ -173,19 +173,6 @@ public class RubiksCube : Entity {
         }
     }
 
-    private CubeColors[,] ReadFace(CanonicalFaces face)
-    {
-        CubeColors[,] faceStickers = new CubeColors[size,size];
-        for (int i = 0; i < size; i++)
-        {
-            for (int j = 0; j < size; j++)
-            {
-                faceStickers[i,j] = cube[(int)face,i,j];
-            }
-        }
-        return faceStickers;
-    }
-
     private CubeColors[] ReadLine(CanonicalFaces face, LineType lineType, int index, bool reverse)
     {
         CubeColors[] line = new CubeColors[size];
