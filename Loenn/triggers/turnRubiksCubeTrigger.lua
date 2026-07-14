@@ -8,8 +8,9 @@ local turnRubiksCubeTrigger = {
             name = "turn_rubiks_cube_trigger",
             data = {
                 face = "Down",
-                turnDepth = 0;
-                direction = "Clockwise"
+                turnDepth = 0,
+                direction = "Clockwise",
+                cubeID = ""
             }
         },
     },

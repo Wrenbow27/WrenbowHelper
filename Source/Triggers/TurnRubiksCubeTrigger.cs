@@ -11,6 +11,9 @@ public class TurnRubiksCubeTrigger : Trigger {
     private readonly string face;
     private readonly int turnDepth;
     private readonly string direction;
+    private readonly string cubeID;
+
+    private RubiksCube cube;
 
     private readonly WrenbowHelper.RubiksLogic.RubiksTurn turn;
 
@@ -19,6 +22,7 @@ public class TurnRubiksCubeTrigger : Trigger {
         face = data.String("face", "Down");
         turnDepth = data.Int("turnDepth", 0);
         direction = data.String("direction", "Clockwise");
+        cubeID = data.String("cubeID", "");
 
         turn = new WrenbowHelper.RubiksLogic.RubiksTurn(
             Enum.Parse<WrenbowHelper.RubiksLogic.AbsoluteFaces>(face),
@@ -26,15 +30,15 @@ public class TurnRubiksCubeTrigger : Trigger {
             turnDepth);
     }
 
+    public override void Awake(Scene scene)
+    {
+        base.Awake(scene);
+        cube = RubiksCube.Find(scene, cubeID);
+    }
+
     public override void OnEnter(Player player)
     {
         base.OnEnter(player);
-
-        WrenbowHelper.Entities.RubiksCube cube = Scene.Tracker.GetEntity<WrenbowHelper.Entities.RubiksCube>();
-
-        if (cube != null)
-        {
-            cube?.RubiksTurn(turn, false);
-        }
+        cube?.RubiksTurn(turn, false);
     }
 }

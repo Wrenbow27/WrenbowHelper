@@ -17,6 +17,7 @@ public class RubiksState
     {
         Size = size;
         Cube = new RubiksLogic.CubeColors[6, size, size];
+        InitializeCube();
     }
 
     public bool IsLocked { get; set; }
@@ -41,6 +42,13 @@ public class RubiksState
             }
         }
         return true;
+    }
+    private void InitializeCube()
+    {
+        for (int face = 0; face < 6; face++)
+        {
+            RubiksLogic.FloodFace(this, (RubiksLogic.AbsoluteFaces)face, (RubiksLogic.CubeColors)face); //relies on the order of the enums not changing
+        }
     }
 }
 

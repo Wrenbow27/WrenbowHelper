@@ -10,11 +10,11 @@ local rubiksCube = {
             size = 3,
             startScrambled = true,
             scrambleLength = 30,
-            solvedFlag = "",
+            solvedFlag = "WrenbowHelper_RubiksCube0Solved",
             displayType = "NetL",
             lockOnSolve = true,
             persistent = true,
-            CubeID = ""
+            CubeID = "Cube0"
             }
         }
     },
