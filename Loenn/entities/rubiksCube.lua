@@ -9,19 +9,21 @@ local rubiksCube = {
         data = {
             size = 3,
             startScrambled = true,
-            scrambleDepth = 30,
+            scrambleLength = 30,
             solvedFlag = "",
-            displayType = "NetL"
+            displayType = "NetL",
+            lockOnSolve = true,
+            persistent = true,
+            CubeID = ""
             }
         }
     },
     fieldInformation = {
         size = {
             fieldType = "integer",
-            minimumValue = 2,
-            maximumValue = 5
+            minimumValue = 2
         },
-        scrambleDepth = {
+        scrambleLength = {
             fieldType = "integer",
             minimumValue = 0
         },
@@ -30,6 +32,9 @@ local rubiksCube = {
         },
         displayType = {
             options = displayTypes
+        },
+        CubeID = {
+            fieldType = "string"
         }
     },
 }

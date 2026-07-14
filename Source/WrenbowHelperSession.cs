@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Monocle;
+using System.Collections.Generic;
 
 namespace Celeste.Mod.WrenbowHelper
 {
@@ -15,6 +16,7 @@ namespace Celeste.Mod.WrenbowHelper
         public bool Persistent = false;
         public bool TrailIndicator = false;
         public Color TrailColor = Calc.HexToColor("c81ec8");
+        public Dictionary<string, RubiksState> RubiksCubes = new();
 
     }
 }

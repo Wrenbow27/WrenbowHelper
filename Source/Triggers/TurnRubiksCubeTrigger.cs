@@ -1,5 +1,6 @@
 using System;
 using Celeste.Mod.Entities;
+using Celeste.Mod.WrenbowHelper.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
 
@@ -11,7 +12,7 @@ public class TurnRubiksCubeTrigger : Trigger {
     private readonly int turnDepth;
     private readonly string direction;
 
-    private readonly WrenbowHelper.Entities.RubiksCube.RubiksTurn turn;
+    private readonly WrenbowHelper.RubiksLogic.RubiksTurn turn;
 
     public TurnRubiksCubeTrigger(EntityData data, Vector2 offset) : base(data, offset)
     {
@@ -19,9 +20,9 @@ public class TurnRubiksCubeTrigger : Trigger {
         turnDepth = data.Int("turnDepth", 0);
         direction = data.String("direction", "Clockwise");
 
-        turn = new WrenbowHelper.Entities.RubiksCube.RubiksTurn(
-            Enum.Parse<WrenbowHelper.Entities.RubiksCube.CanonicalFaces>(face),
-            Enum.Parse<WrenbowHelper.Entities.RubiksCube.TurnDir>(direction),
+        turn = new WrenbowHelper.RubiksLogic.RubiksTurn(
+            Enum.Parse<WrenbowHelper.RubiksLogic.AbsoluteFaces>(face),
+            Enum.Parse<WrenbowHelper.RubiksLogic.TurnDir>(direction),
             turnDepth);
     }
 
@@ -33,7 +34,7 @@ public class TurnRubiksCubeTrigger : Trigger {
 
         if (cube != null)
         {
-            cube.DoTurn(turn);
+            cube?.RubiksTurn(turn, false);
         }
     }
 }
