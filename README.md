@@ -19,6 +19,9 @@ A refill that can also be collected by holdables
 Set LiftSpeed trigger:
 Overides normal liftspeed inheritence with a custom value (very silly)
 
+Rubiks Cubes:
+Coming soon :3
+
 -Credits-
 
 Chronia Helper - moreOptions lua code
