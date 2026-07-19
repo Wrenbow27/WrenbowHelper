@@ -24,7 +24,7 @@ public class RubiksCube : Entity {
     //private CubeColors[,,] cube; //[face, row, column] (matrix convention)
     private readonly RubiksState state;
 
-    private readonly MTexture sticker;
+    private MTexture sticker;
 
     private static readonly Color[] StickerColors =
     {
@@ -74,8 +74,6 @@ public class RubiksCube : Entity {
         }
 
         faceSpacing = (stickerSpacing*size) + faceGap;
-
-        sticker = GFX.Game["objects/WrenbowHelper/RubiksCube/RubiksSticker"];
     }
 
     public override void Added(Scene scene)
@@ -151,13 +149,12 @@ public class RubiksCube : Entity {
             return scene.Tracker.GetEntity<RubiksCube>();
 
         }
-        
+
         foreach (RubiksCube cube in scene.Tracker.GetEntities<RubiksCube>())
         {
             if (cube.cubeID == cubeID)
                 return cube;
         }
-
         return null;
     }
 
@@ -180,7 +177,7 @@ public class RubiksCube : Entity {
             for (int j = 0; j < state.Size; j++)
             {
                 RubiksLogic.CubeColors color = state.Cube[(int)face, i, j];
-
+                sticker = GFX.Game["objects/WrenbowHelper/RubiksCube/RubiksSticker"+(WrenbowHelperSettings.RubiksColorBlindMode ? "CB"+((int)color).ToString() : "")];
                 sticker.Draw(origin + (new Vector2(j, i) * stickerSpacing), Vector2.Zero, GetStickerColor(color));
             }
         }

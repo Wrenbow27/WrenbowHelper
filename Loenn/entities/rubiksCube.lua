@@ -4,7 +4,7 @@ local rubiksCube = {
     name = "WrenbowHelper/RubiksCube",
 
     placements = {
-    {
+        {
         name = "rubiks_cube",
         data = {
             size = 3,

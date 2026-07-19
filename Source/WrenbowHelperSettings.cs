@@ -12,5 +12,8 @@
                 Logger.Log(LogLevel.Debug, "WrenbowHelper", $"Setting DreamBlockLiftSpeedFix to {value}");
             }
         }
+
+        [SettingName("wrenbowHelper_rubiksColorBlindMode")]
+        public static bool RubiksColorBlindMode { get; set; }
     }
 }

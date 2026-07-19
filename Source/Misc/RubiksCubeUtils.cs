@@ -24,14 +24,15 @@ public class RubiksState
 
     private bool CheckSolved()
     {
-        HashSet<RubiksLogic.CubeColors> seenColors = new();
+        bool[] seenColors = [false, false, false, false, false, false];
         for (int face = 0; face < 6; face++)
         {
             RubiksLogic.CubeColors color = Cube[face, 0, 0];
-            if (!seenColors.Add(color))
+            if (seenColors[(int)color])
             {
                 return false;
             }
+            seenColors[(int)color] = true;
             for (int i = 0; i < Size; i++)
             {
                 for (int j = 0; j < Size; j++)
