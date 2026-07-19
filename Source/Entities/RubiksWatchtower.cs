@@ -11,6 +11,35 @@ namespace Celeste.Mod.WrenbowHelper.Entities;
 [Tracked]
 
 public class RubiksWatchtower : Entity {
+
+    public class Hud : Entity
+    {
+        public float Easer;
+        public Hud ()
+		{
+            AddTag(Tags.HUD);
+        }
+        public override void Render()
+        {
+            Level level = base.Scene as Level;
+			float num = Ease.CubeInOut (Easer);
+			Color val = Color.White * num;
+			int num2 = (int)(80f * num);
+			int num3 = (int)(80f * num * 0.5625f);
+			int num4 = 8;
+			if (level.FrozenOrPaused || level.RetryPlayerCorpse != null) {
+				val *= 0.25f;
+			}
+			Draw.Rect (num2, num3, 1920 - num2 * 2 - num4, num4, val);
+			Draw.Rect (num2, num3 + num4, num4 + 2, 1080 - num3 * 2 - num4, val);
+			Draw.Rect (1920 - num2 - num4 - 2, num3, num4 + 2, 1080 - num3 * 2 - num4, val);
+			Draw.Rect (num2 + num4, 1080 - num3 - num4, 1920 - num2 * 2 - num4, num4, val);
+			if (level.FrozenOrPaused || level.RetryPlayerCorpse != null) {
+				return;
+			}
+        }
+    }
+
     //lonn declared
     private readonly string cubeID;
 
@@ -18,6 +47,7 @@ public class RubiksWatchtower : Entity {
     private Vector2 CameraTarget;
     public Sprite sprite;
     public TalkComponent talk;
+    public Hud hud;
     public bool interacting;
     public string animPrefix = "";
 
@@ -100,8 +130,8 @@ public class RubiksWatchtower : Entity {
 		player.StateMachine.State = 11;
         yield return player.DummyWalkToExact((int)X, walkBackwards: false, 1f, cancelOnFall: true);
 
-        level.Camera.Position = CameraTarget - new Vector2(160, 90);
-        
+        //level.Camera.Position = CameraTarget - new Vector2(160, 90);
+
         if (Math.Abs (X - player.X) > 4f || player.Dead || !player.OnGround ()) {
 			if (!player.Dead) {
 				player.StateMachine.State = 0;
@@ -120,11 +150,27 @@ public class RubiksWatchtower : Entity {
 		hair.Visible = false;
 		playerSprite.Visible = visible;
         yield return 0.2f;
+        Scene.Add(hud = new Hud());
 
         Audio.Play ("event:/ui/game/lookout_on");
+		while ((hud.Easer = Calc.Approach (hud.Easer, 1f, Engine.DeltaTime * 3f)) < 1f) {
+			level.ScreenPadding = (int)(Ease.CubeInOut (hud.Easer) * 16f);
+			yield return null;
+		}
+		Vector2 cam = level.Camera.Position;
+		Vector2 speed = Vector2.Zero;
+		Vector2 lastDir = Vector2.Zero;
+		Vector2 camStart = level.Camera.Position;
+		Vector2 camStartCenter = camStart + new Vector2 (160f, 90f);
 
         while (!Input.MenuCancel.Pressed && !Input.MenuConfirm.Pressed && !Input.Dash.Pressed && !Input.Jump.Pressed && interacting)
         {
+			Vector2 target = CameraTarget - new Vector2(160, 90);
+			target.X = Calc.Clamp( target.X, level.Bounds.Left, level.Bounds.Right - 320);
+            target.Y = Calc.Clamp(target.Y, level.Bounds.Top, level.Bounds.Bottom - 180);
+
+            level.Camera.Position = Calc.Approach( level.Camera.Position, target, 600f * Engine.DeltaTime);
+
             HandleInputs();
 
             yield return null;
@@ -137,6 +183,10 @@ public class RubiksWatchtower : Entity {
 		playerSprite2.Visible = visible;
 		sprite.Play (animPrefix + "idle");
         Audio.Play("event:/ui/game/lookout_off");
+		while ((hud.Easer = Calc.Approach (hud.Easer, 0f, Engine.DeltaTime * 3f)) > 0f) {
+			level.ScreenPadding = (int)(Ease.CubeInOut (hud.Easer) * 16f);
+			yield return null;
+        }
 
         Audio.SetMusicParam ("escape", 0f);
 		level.ScreenPadding = 0f;
@@ -149,6 +199,6 @@ public class RubiksWatchtower : Entity {
 
     private void HandleInputs()
     {
-        
+
     }
 }
