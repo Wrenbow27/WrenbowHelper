@@ -8,12 +8,12 @@ local rubiksWatchtower = {
         {
             name = "rubiks_watchtower",
             data = {
-                cubeID = "Cube0"
+                cubeName = "Cube0"
             }
         }
     },
     fieldInformation = {
-        cubeID = {
+        cubeName = {
             fieldType = "string"
         }
     },

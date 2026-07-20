@@ -14,7 +14,7 @@ local rubiksCube = {
             displayType = "NetL",
             lockOnSolve = true,
             persistent = true,
-            CubeID = "Cube0"
+            cubeName = ""
             }
         }
     },
@@ -33,7 +33,7 @@ local rubiksCube = {
         displayType = {
             options = displayTypes
         },
-        CubeID = {
+        cubeName = {
             fieldType = "string"
         }
     },

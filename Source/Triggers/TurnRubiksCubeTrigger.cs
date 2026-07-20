@@ -12,7 +12,7 @@ public class TurnRubiksCubeTrigger : Trigger {
     private readonly int layer;
     private readonly string direction;
     private readonly string operation;
-    private readonly string cubeID;
+    private readonly string cubeName;
 
     private RubiksCube cube;
 
@@ -24,7 +24,7 @@ public class TurnRubiksCubeTrigger : Trigger {
         layer = data.Int("layer", 0);
         direction = data.String("direction", "Clockwise");
         operation = data.String("operation", "All");
-        cubeID = data.String("cubeID", "");
+        cubeName = data.String("cubeName", "");
 
         turn = new WrenbowHelper.RubiksLogic.RubiksTurn(
             Enum.Parse<WrenbowHelper.RubiksLogic.AbsoluteFaces>(face),
@@ -35,7 +35,7 @@ public class TurnRubiksCubeTrigger : Trigger {
     public override void Awake(Scene scene)
     {
         base.Awake(scene);
-        cube = RubiksCube.Find(scene, cubeID);
+        cube = RubiksCube.Find(scene, cubeName);
     }
 
     public override void OnEnter(Player player)

@@ -19,7 +19,7 @@ public class RubiksCube : Entity {
     private readonly string displayType;
     private readonly bool lockOnSolve;
     private readonly bool persistent;
-    private readonly string cubeID;
+    private readonly string cubeName;
 
     //private CubeColors[,,] cube; //[face, row, column] (matrix convention)
     private readonly RubiksState state;
@@ -43,7 +43,7 @@ public class RubiksCube : Entity {
 
     private bool queuedScramble = false;
     private int scrambleAnimationTimer; //Qty of frames to play scramble animations for
-    private bool wasLoaded = false;
+    private bool isInitialized = false;
     private static readonly Random rng = new();
 
     public RubiksCube(EntityData data, Vector2 offset)
@@ -54,13 +54,13 @@ public class RubiksCube : Entity {
         scrambleLength = data.Int("scrambleLength", 30);
         solvedFlag = data.String("solvedFlag", "");
         displayType = data.String("displayType", "NetL");
-        cubeID = data.String("cubeID", "Cube0");
-        persistent = data.Bool("persistent", true) && !string.IsNullOrEmpty(cubeID);
+        cubeName = data.String("cubeName", "");
+        persistent = data.Bool("persistent", true) && !string.IsNullOrEmpty(cubeName);
         lockOnSolve = data.Bool("lockOnSolve", true);
 
-        if (persistent && WrenbowHelperModule.Session.RubiksCubes.TryGetValue(cubeID, out RubiksState savedState))
+        if (persistent && WrenbowHelperModule.Session.RubiksCubes.TryGetValue(cubeName, out RubiksState savedState))
         {
-            wasLoaded = true;
+            isInitialized = true;
             state = savedState;
         }
         else
@@ -69,7 +69,7 @@ public class RubiksCube : Entity {
 
             if (persistent)
             {
-                WrenbowHelperModule.Session.RubiksCubes[cubeID] = state;
+                WrenbowHelperModule.Session.RubiksCubes[cubeName] = state;
             }
         }
 
@@ -80,7 +80,7 @@ public class RubiksCube : Entity {
     public override void Added(Scene scene)
     {
         base.Added(scene);
-        if (startScrambled && !wasLoaded)
+        if (startScrambled && !isInitialized)
         {
             queuedScramble = true;
         }
@@ -89,9 +89,9 @@ public class RubiksCube : Entity {
     public override void Update()
     {
         base.Update();
-        if (!wasLoaded)
+        if (!isInitialized)
         {
-            wasLoaded = true;
+            isInitialized = true;
         }
         if (queuedScramble)
         {
@@ -173,9 +173,9 @@ public class RubiksCube : Entity {
         return isSolved;
     }
 
-    public static RubiksCube Find(Scene scene, string cubeID)
+    public static RubiksCube Find(Scene scene, string cubeName)
     {
-        if (string.IsNullOrEmpty(cubeID))
+        if (string.IsNullOrEmpty(cubeName))
         {
             return scene.Tracker.GetEntity<RubiksCube>();
 
@@ -183,7 +183,7 @@ public class RubiksCube : Entity {
 
         foreach (RubiksCube cube in scene.Tracker.GetEntities<RubiksCube>())
         {
-            if (cube.cubeID == cubeID)
+            if (cube.cubeName == cubeName)
                 return cube;
         }
         return null;
@@ -216,7 +216,7 @@ public class RubiksCube : Entity {
 
     private Color GetStickerColor(RubiksLogic.CubeColors color)
     {
-        if (scrambleAnimationTimer > 0 && wasLoaded)
+        if (scrambleAnimationTimer > 0 && isInitialized)
         {
             return StickerColors[rng.Next(0,6)];
         }

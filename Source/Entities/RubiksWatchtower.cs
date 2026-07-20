@@ -41,7 +41,7 @@ public class RubiksWatchtower : Entity {
     }
 
     //lonn declared
-    private readonly string cubeID;
+    private readonly string cubeName;
 
     private RubiksCube cube;
     private Vector2 CameraTarget;
@@ -54,7 +54,7 @@ public class RubiksWatchtower : Entity {
     public RubiksWatchtower(EntityData data, Vector2 offset)
         : base(data.Position + offset)
     {
-        cubeID = data.String("cubeID", "Cube0");
+        cubeName = data.String("cubeName", "Cube0");
         base.Depth = -8500;
 		Add (talk = new TalkComponent (new Rectangle (-24, -8, 48, 8), new Vector2 (-0.5f, -20f), Interact));
         talk.PlayerMustBeFacing = false;
@@ -67,7 +67,7 @@ public class RubiksWatchtower : Entity {
     public override void Awake(Scene scene)
     {
         base.Awake(scene);
-        cube = RubiksCube.Find(scene, cubeID);
+        cube = RubiksCube.Find(scene, cubeName);
     }
 
     public override void Removed (Scene scene)
