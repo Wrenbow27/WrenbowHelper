@@ -12,6 +12,9 @@ public class RubiksState
     public RubiksLogic.CubeColors[,,] Cube { get; }
     public int Size { get; }
     public bool IsSolved => CheckSolved();
+    public RubiksLogic.AbsoluteFaces? SelectedFace;
+    public int? SelectedLayer;
+    public RubiksLogic.TurnDir? SelectedDir;
 
     public RubiksState(int size)
     {
@@ -128,6 +131,10 @@ public static class RubiksLogic
             TurnFaceStickers(state, turn.Face, turn.Direction);
         }
         TurnRingStickers(state, turn.Face, turn.Direction, turn.Depth);
+
+        state.SelectedFace = null;
+        state.SelectedLayer = null;
+        state.SelectedDir = null;
     }
 
     private static void TurnFaceStickers(RubiksState state, AbsoluteFaces face, TurnDir dir)

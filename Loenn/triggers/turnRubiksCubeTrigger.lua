@@ -1,5 +1,6 @@
 local faces = {"Down","Up","Left","Right","Front","Back"}
 local directions = {"Clockwise", "Widdershins"}
+local operations = {"Select Face", "Select Layer", "Select Direction", "Turn Selection", "All"}
 
 local turnRubiksCubeTrigger = {
     name = "WrenbowHelper/TurnRubiksCubeTrigger",
@@ -8,9 +9,10 @@ local turnRubiksCubeTrigger = {
             name = "turn_rubiks_cube_trigger",
             data = {
                 face = "Down",
-                turnDepth = 0,
+                layer = 0,
                 direction = "Clockwise",
-                cubeID = ""
+                cubeID = "",
+                operation = "All"
             }
         },
     },
@@ -18,12 +20,15 @@ local turnRubiksCubeTrigger = {
         face = {
             options = faces
         },
-        turnDepth = {
+        turnLayer = {
             fieldType = "integer",
             minimumValue = 0
         },
         direction = {
             options = directions
+        },
+        operation = {
+            options = operations
         }
     },
 }

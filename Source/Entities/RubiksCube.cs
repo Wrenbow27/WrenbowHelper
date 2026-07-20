@@ -109,15 +109,45 @@ public class RubiksCube : Entity {
         }
     }
 
-    public void RubiksTurn(RubiksLogic.RubiksTurn turn, bool overrideLock)
+    public void RubiksTurn(RubiksLogic.RubiksTurn turn)
     {
-        if (state.IsLocked && !overrideLock)
+        if (state.IsLocked)
         {
             //fail turn
             return;
         }
         RubiksLogic.DoTurn(state, turn);
         RubiksSolved();
+    }
+
+    public void RubiksTurn()
+    {
+        if (state.IsLocked || !state.SelectedFace.HasValue || !state.SelectedLayer.HasValue || !state.SelectedDir.HasValue)
+        {
+            //fail turn
+            return;
+        }
+        RubiksLogic.RubiksTurn turn = new WrenbowHelper.RubiksLogic.RubiksTurn(
+                    state.SelectedFace ?? RubiksLogic.AbsoluteFaces.Down,
+                    state.SelectedDir ?? RubiksLogic.TurnDir.Clockwise,
+                    state.SelectedLayer ?? 0);
+        RubiksLogic.DoTurn(state, turn);
+        RubiksSolved();
+    }
+
+    public void RubiksSelect(RubiksLogic.AbsoluteFaces face)
+    {
+        state.SelectedFace = face;
+    }
+
+    public void RubiksSelect(int layer)
+    {
+        state.SelectedLayer = layer;
+    }
+
+       public void RubiksSelect(RubiksLogic.TurnDir dir)
+    {
+        state.SelectedDir = dir;
     }
 
     public void InitScramble(int scrambleLength)
