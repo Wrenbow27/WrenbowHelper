@@ -1,4 +1,4 @@
-local displayTypes = {"NetL"}
+local displayTypes = {"NetL","NetR"}
 
 local rubiksCube = {
     name = "WrenbowHelper/RubiksCube",

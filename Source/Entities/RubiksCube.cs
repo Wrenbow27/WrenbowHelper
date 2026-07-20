@@ -39,6 +39,7 @@ public class RubiksCube : Entity {
     private readonly int stickerSpacing = 9;
     private readonly int faceGap = 1;
     private readonly int faceSpacing;
+    private readonly Vector2[] facePositions;
 
     private bool queuedScramble = false;
     private int scrambleAnimationTimer; //Qty of frames to play scramble animations for
@@ -55,7 +56,6 @@ public class RubiksCube : Entity {
         displayType = data.String("displayType", "NetL");
         cubeID = data.String("cubeID", "Cube0");
         persistent = data.Bool("persistent", true) && !string.IsNullOrEmpty(cubeID);
-        //persistent = true;
         lockOnSolve = data.Bool("lockOnSolve", true);
 
         if (persistent && WrenbowHelperModule.Session.RubiksCubes.TryGetValue(cubeID, out RubiksState savedState))
@@ -73,7 +73,8 @@ public class RubiksCube : Entity {
             }
         }
 
-        faceSpacing = (stickerSpacing*size) + faceGap;
+        faceSpacing = (stickerSpacing * size) + faceGap;
+        facePositions = GetFacePositions();
     }
 
     public override void Added(Scene scene)
@@ -192,12 +193,12 @@ public class RubiksCube : Entity {
     {
         base.Render();
 
-        DrawFace(RubiksLogic.AbsoluteFaces.Down, Position + new Vector2(2 * faceSpacing, 2 * faceSpacing));
-        DrawFace(RubiksLogic.AbsoluteFaces.Up, Position + new Vector2(2 * faceSpacing, 0));
-        DrawFace(RubiksLogic.AbsoluteFaces.Left, Position + new Vector2(1 * faceSpacing, 1 * faceSpacing));
-        DrawFace(RubiksLogic.AbsoluteFaces.Right, Position + new Vector2(3 * faceSpacing, 1 * faceSpacing));
-        DrawFace(RubiksLogic.AbsoluteFaces.Front, Position + new Vector2(2 * faceSpacing, 1 * faceSpacing));
-        DrawFace(RubiksLogic.AbsoluteFaces.Back, Position + new Vector2(0, 1*faceSpacing));
+        DrawFace(RubiksLogic.AbsoluteFaces.Down, Position + facePositions[0]);
+        DrawFace(RubiksLogic.AbsoluteFaces.Up, Position + facePositions[1]);
+        DrawFace(RubiksLogic.AbsoluteFaces.Left, Position + facePositions[2]);
+        DrawFace(RubiksLogic.AbsoluteFaces.Right, Position + facePositions[3]);
+        DrawFace(RubiksLogic.AbsoluteFaces.Front, Position + facePositions[4]);
+        DrawFace(RubiksLogic.AbsoluteFaces.Back, Position + facePositions[5]);
     }
 
     private void DrawFace(RubiksLogic.AbsoluteFaces face, Vector2 origin)
@@ -224,5 +225,28 @@ public class RubiksCube : Entity {
             return StickerColors[(int)color];
         }
 
+    }
+
+    private Vector2[] GetFacePositions()
+    {
+        switch (displayType)
+        {
+            case "NetL":
+                return [new Vector2(2 * faceSpacing, 2 * faceSpacing),
+                        new Vector2(2 * faceSpacing, 0),
+                        new Vector2(faceSpacing, faceSpacing),
+                        new Vector2(3 * faceSpacing, faceSpacing),
+                        new Vector2(2 * faceSpacing, faceSpacing),
+                        new Vector2(0, 1 * faceSpacing),];
+
+            case "NetR":
+                return [new Vector2(faceSpacing, 2 * faceSpacing),
+                        new Vector2(faceSpacing, 0),
+                        new Vector2(0, faceSpacing),
+                        new Vector2(2 * faceSpacing, faceSpacing),
+                        new Vector2(faceSpacing, faceSpacing),
+                        new Vector2(3 * faceSpacing, 1 * faceSpacing),];
+        }
+        throw new InvalidOperationException("WrenbowHelper_RubiksCube: Invalid display type");
     }
 }
