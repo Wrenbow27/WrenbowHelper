@@ -203,13 +203,14 @@ public class RubiksCube : Entity {
 
     private void DrawFace(RubiksLogic.AbsoluteFaces face, Vector2 origin)
     {
+        Draw.Rect(origin.X, origin.Y, size * stickerSpacing + 1, size * stickerSpacing + 1, Color.Black);
         for (int i = 0; i < state.Size; i++)
         {
             for (int j = 0; j < state.Size; j++)
             {
                 RubiksLogic.CubeColors color = state.Cube[(int)face, i, j];
                 sticker = GFX.Game["objects/WrenbowHelper/RubiksCube/RubiksSticker"+(WrenbowHelperSettings.RubiksColorBlindMode ? "CB"+((int)color).ToString() : "")];
-                sticker.Draw(origin + (new Vector2(j, i) * stickerSpacing), Vector2.Zero, GetStickerColor(color));
+                sticker.Draw(origin + (new Vector2(j, i) * stickerSpacing) + Vector2.One, Vector2.Zero, GetStickerColor(color));
             }
         }
     }

@@ -20,7 +20,7 @@ local turnRubiksCubeTrigger = {
         face = {
             options = faces
         },
-        turnLayer = {
+        layer = {
             fieldType = "integer",
             minimumValue = 0
         },
