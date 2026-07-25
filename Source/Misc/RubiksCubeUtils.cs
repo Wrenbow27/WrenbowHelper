@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -12,15 +13,46 @@ public class RubiksState
     public RubiksLogic.CubeColors[,,] Cube { get; }
     public int Size { get; }
     public bool IsSolved => CheckSolved();
-    public RubiksLogic.AbsoluteFaces? SelectedFace;
-    public int? SelectedLayer;
-    public RubiksLogic.TurnDir? SelectedDir;
+    public RubiksLogic.HighlightLevel[,,] Highlights;
+    private RubiksLogic.AbsoluteFaces? selectedFace;
+    private int? selectedLayer;
+    private RubiksLogic.TurnDir? selectedDir;
+    public RubiksLogic.AbsoluteFaces? SelectedFace
+    {
+        get => selectedFace;
+        set
+        {
+            selectedFace = value;
+            UpdateHighlights(selectedFace, selectedLayer);
+        }
+    }
+
+    public int? SelectedLayer
+    {
+        get => selectedLayer;
+        set
+        {
+            selectedLayer = value;
+            UpdateHighlights(selectedFace, selectedLayer);
+        }
+    }
+
+    public RubiksLogic.TurnDir? SelectedDir
+    {
+        get => selectedDir;
+        set
+        {
+            selectedDir = value;
+            UpdateHighlights(selectedFace, selectedLayer);
+        }
+    }
 
     public RubiksState(int size)
     {
         Size = size;
         Cube = new RubiksLogic.CubeColors[6, size, size];
         InitializeCube();
+        Highlights = new RubiksLogic.HighlightLevel[6, size, size];
     }
 
     public bool IsLocked { get; set; }
@@ -52,6 +84,17 @@ public class RubiksState
         for (int face = 0; face < 6; face++)
         {
             RubiksLogic.FloodFace(this, (RubiksLogic.AbsoluteFaces)face, (RubiksLogic.CubeColors)face); //relies on the order of the enums not changing
+        }
+    }
+    private void UpdateHighlights(RubiksLogic.AbsoluteFaces? selectedFace, int? selectedLayer)
+    {
+        if (selectedFace is not null)
+        {
+            RubiksLogic.BuildHighlights(this, (RubiksLogic.AbsoluteFaces)selectedFace, selectedLayer ?? 0);
+        }
+        else
+        {
+            Array.Clear(Highlights, 0, Highlights.Length);
         }
     }
 }
@@ -101,6 +144,13 @@ public static class RubiksLogic
         Widdershins //Widdershins in the big 26 raah
     }
 
+    public enum HighlightLevel
+    {
+        None, //sticker will not be turned
+        Primary, //sticker will be turned
+        Secondary //sticker is of a reference face
+    }
+
     private enum LineType
     {
         Row,
@@ -135,6 +185,7 @@ public static class RubiksLogic
         state.SelectedFace = null;
         state.SelectedLayer = null;
         state.SelectedDir = null;
+
     }
 
     private static void TurnFaceStickers(RubiksState state, AbsoluteFaces face, TurnDir dir)
@@ -235,6 +286,41 @@ public static class RubiksLogic
                         (AbsoluteFaces.Right, LineType.Column, size-depth-1, true)];
         }
         throw new InvalidOperationException("WrenbowHelper_RubiksCube: Invalid rotation face for ring access keys");
+    }
+
+    public static void BuildHighlights(RubiksState state, AbsoluteFaces selectedFace, int selectedLayer)
+    {
+        Array.Clear(state.Highlights, 0, state.Highlights.Length);
+
+        //highlight main face
+        for (int i = 0; i < state.Size; i++)
+        {
+            for (int j = 0; j < state.Size; j++)
+            {
+                state.Highlights[(int)selectedFace,i,j] = (selectedLayer == 0 ? HighlightLevel.Primary : HighlightLevel.Secondary);
+            }
+        }
+
+        //highlight ring
+        (AbsoluteFaces face, LineType lineType, int index, bool reverse)[] ringAccessKeys = GetRingAccessKeys(selectedFace, selectedLayer, state.Size);
+        for (int i = 0; i < 4; i++)
+        {
+            (AbsoluteFaces face, LineType lineType, int index, bool reverse) key = ringAccessKeys[i];
+            if (key.lineType == LineType.Row)
+            {
+                for (int j = 0; j < state.Size; j++)
+                {
+                    state.Highlights[(int)key.face,key.index,j] = HighlightLevel.Primary;
+                }
+            }
+            else if (key.lineType == LineType.Column)
+            {
+                for (int j = 0; j < state.Size; j++)
+                {
+                    state.Highlights[(int)key.face,j,key.index] = HighlightLevel.Primary;
+                }
+            }
+        }
     }
 
     private static  CubeColors[] ReadLine(RubiksState state, AbsoluteFaces face, LineType lineType, int index, bool reverse)

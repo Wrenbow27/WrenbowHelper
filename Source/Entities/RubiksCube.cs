@@ -208,6 +208,14 @@ public class RubiksCube : Entity {
         {
             for (int j = 0; j < state.Size; j++)
             {
+                if (isInitialized)
+                {
+                    RubiksLogic.HighlightLevel highlight = state.Highlights[(int)face, i, j];
+                    if (highlight != RubiksLogic.HighlightLevel.None)
+                    {
+                        Draw.Rect(origin + (new Vector2(j, i) * stickerSpacing), stickerSpacing+1, stickerSpacing+1, (highlight == RubiksLogic.HighlightLevel.Primary ? Color.LightGray : Color.DarkGray));
+                    }
+                }
                 RubiksLogic.CubeColors color = state.Cube[(int)face, i, j];
                 sticker = GFX.Game["objects/WrenbowHelper/RubiksCube/RubiksSticker"+(WrenbowHelperSettings.RubiksColorBlindMode ? "CB"+((int)color).ToString() : "")];
                 sticker.Draw(origin + (new Vector2(j, i) * stickerSpacing) + Vector2.One, Vector2.Zero, GetStickerColor(color));
