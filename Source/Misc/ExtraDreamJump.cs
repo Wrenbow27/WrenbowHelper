@@ -147,7 +147,7 @@ namespace Celeste.Mod.WrenbowHelper {
                 WrenbowHelperModule.Session.CanDreamJump = false;
                 FlagUpdate(player);
 
-                Audio.Play("event:/WrenbowHelper/DreamJumpRefill", player.Position);
+                Audio.Play("event:/WrenbowHelper/CoyoteRefund", player.Position);
             }
         }
         private static void Player_Added(On.Celeste.Player.orig_Added orig, Player player, Scene scene)
