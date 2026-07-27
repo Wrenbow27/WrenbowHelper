@@ -118,6 +118,7 @@ public class RubiksCube : Entity {
             return;
         }
         RubiksLogic.DoTurn(state, turn);
+        Audio.Play("event:/WrenbowHelper/RubiksSFX", Position);
         RubiksSolved();
     }
 
@@ -133,6 +134,7 @@ public class RubiksCube : Entity {
                     state.SelectedDir ?? RubiksLogic.TurnDir.Clockwise,
                     state.SelectedLayer ?? 0);
         RubiksLogic.DoTurn(state, turn);
+        Audio.Play("event:/WrenbowHelper/RubiksSFX", Position);
         RubiksSolved();
     }
 
@@ -146,10 +148,10 @@ public class RubiksCube : Entity {
         state.SelectedLayer = layer;
     }
 
-       public void RubiksSelect(RubiksLogic.TurnDir dir)
-    {
-        state.SelectedDir = dir;
-    }
+    public void RubiksSelect(RubiksLogic.TurnDir dir)
+{
+    state.SelectedDir = dir;
+}
 
     public void InitScramble(int scrambleLength)
     {
