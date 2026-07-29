@@ -14,7 +14,7 @@ public class RubiksWatchtower : Entity {
 
     public class Hud : Entity
     {
-        public float Easer;
+        internal float Easer;
         public Hud ()
 		{
             AddTag(Tags.HUD);
