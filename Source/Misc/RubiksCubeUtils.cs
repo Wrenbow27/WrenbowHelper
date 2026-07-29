@@ -48,10 +48,10 @@ public class RubiksState
         }
     }
 
-    public Random RNG { get; } = new();
-    public ulong endScrambleAnimFrame = Engine.FrameCounter;
+    public Random RNG { get; } = new(); //used for scrambling
+    public ulong endScrambleAnimFrame = Engine.FrameCounter; //used to set the scrambling animation
     public string SolvedFlag { get; internal set; }
-    public bool? FlagUpdatePending { get; internal set; }
+    public bool? FlagUpdatePending { get; internal set; } //"flags" a flag change, since it can't be done here without a level or scene reference
     public bool LockOnSolve { get; internal set; }
 
     public RubiksState(int size)
@@ -104,7 +104,7 @@ public class RubiksState
             Array.Clear(Highlights, 0, Highlights.Length);
         }
     }
-    public bool RubiksTurn(RubiksLogic.RubiksTurn turn)
+    public bool RubiksTurn(RubiksLogic.RubiksTurn turn) //Overload for when given a specific turn
     {
         if (IsLocked)
         {
@@ -116,7 +116,7 @@ public class RubiksState
         return true;
     }
 
-    public bool RubiksTurn()
+    public bool RubiksTurn() //Overload to try and turn via selections
     {
         if (IsLocked || !SelectedFace.HasValue || !SelectedLayer.HasValue || !SelectedDir.HasValue)
         {
@@ -136,7 +136,7 @@ public class RubiksState
     {
         endScrambleAnimFrame = Engine.FrameCounter + 30;
         RubiksLogic.Scramble(this, scrambleLength, RNG);
-        RubiksSolved();
+        RubiksSolved(); //Check the edge case where the cube is scrambled into its solved state 
     }
     public void RubiksSelect(RubiksLogic.AbsoluteFaces face)
     {
@@ -178,7 +178,7 @@ public class RubiksState
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-public static class RubiksLogic
+public static class RubiksLogic //Owns the logic for cube manipulation and base structs
 {
     public readonly struct RubiksTurn
     {
@@ -328,7 +328,7 @@ public static class RubiksLogic
 
     private static (AbsoluteFaces face, LineType lineType, int index, bool reverse)[] GetRingAccessKeys(AbsoluteFaces face, int depth, int size)
     {
-        switch (face)
+        switch (face) //returns values that allow the turning non-face stickers to be accessed and manipulated
         {
             case AbsoluteFaces.Down:
                 return [(AbsoluteFaces.Front, LineType.Row, size-depth-1, false),

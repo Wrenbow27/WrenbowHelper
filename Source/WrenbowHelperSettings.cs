@@ -22,16 +22,16 @@ namespace Celeste.Mod.WrenbowHelper
         [SettingName("wrenbowHelper_rubiksColorBlindMode")]
         public static bool RubiksWatchtowerInvertDiagonals { get; set; }
 
-        [DefaultButtonBinding(Buttons.RightShoulder, Keys.D)]
+        [DefaultButtonBinding(Buttons.RightThumbstickRight, Keys.D)]
         public ButtonBinding RubiksWatchtowerClockwiseTurn { get; set; }
 
-        [DefaultButtonBinding(Buttons.RightShoulder, Keys.S)]
+        [DefaultButtonBinding(Buttons.RightThumbstickLeft, Keys.S)]
         public ButtonBinding RubiksWatchtowerWiddershinsTurn { get; set; }
 
         [DefaultButtonBinding(Buttons.RightShoulder, Keys.A)]
         public ButtonBinding RubiksWatchtowerDecrementLayer { get; set; }
 
-        [DefaultButtonBinding(Buttons.RightShoulder, Keys.Z)]
+        [DefaultButtonBinding(Buttons.LeftShoulder, Keys.Z)]
         public ButtonBinding RubiksWatchtowerIncrementLayer { get; set; }
     }
 }
