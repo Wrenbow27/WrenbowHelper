@@ -22,7 +22,7 @@ public class RubiksCube : Entity {
     private readonly string cubeName;
 
     //private CubeColors[,,] cube; //[face, row, column] (matrix convention)
-    private readonly RubiksState state;
+    internal readonly RubiksState state;
 
     private MTexture sticker;
 
@@ -96,8 +96,7 @@ public class RubiksCube : Entity {
         if (queuedScramble)
         {
             queuedScramble = false;
-            InitScramble(scrambleLength);
-            RubiksSolved();
+            RubiksScramble(scrambleLength);
         }
 
         if (scrambleAnimationTimer > 0)
@@ -110,24 +109,25 @@ public class RubiksCube : Entity {
         }
     }
 
-    public void RubiksTurn(RubiksLogic.RubiksTurn turn)
+    public bool RubiksTurn(RubiksLogic.RubiksTurn turn)
     {
         if (state.IsLocked)
         {
             //fail turn
-            return;
+            return false;
         }
         RubiksLogic.DoTurn(state, turn);
         Audio.Play("event:/WrenbowHelper/RubiksSFX", Position);
         RubiksSolved();
+        return true;
     }
 
-    public void RubiksTurn()
+    public bool RubiksTurn()
     {
         if (state.IsLocked || !state.SelectedFace.HasValue || !state.SelectedLayer.HasValue || !state.SelectedDir.HasValue)
         {
             //fail turn
-            return;
+            return false;
         }
         RubiksLogic.RubiksTurn turn = new WrenbowHelper.RubiksLogic.RubiksTurn(
                     state.SelectedFace ?? RubiksLogic.AbsoluteFaces.Down,
@@ -136,6 +136,7 @@ public class RubiksCube : Entity {
         RubiksLogic.DoTurn(state, turn);
         Audio.Play("event:/WrenbowHelper/RubiksSFX", Position);
         RubiksSolved();
+        return true;
     }
 
     public void RubiksSelect(RubiksLogic.AbsoluteFaces face)
@@ -153,11 +154,12 @@ public class RubiksCube : Entity {
     state.SelectedDir = dir;
 }
 
-    public void InitScramble(int scrambleLength)
+    public void RubiksScramble(int scrambleLength)
     {
         state.IsLocked = true;
         scrambleAnimationTimer = 30;
         RubiksLogic.Scramble(state, scrambleLength, rng);
+        RubiksSolved();
     }
 
     public bool RubiksSolved()
@@ -215,7 +217,7 @@ public class RubiksCube : Entity {
                     RubiksLogic.HighlightLevel highlight = state.Highlights[(int)face, i, j];
                     if (highlight != RubiksLogic.HighlightLevel.None)
                     {
-                        Draw.Rect(origin + (new Vector2(j, i) * stickerSpacing), stickerSpacing+1, stickerSpacing+1, (highlight == RubiksLogic.HighlightLevel.Primary ? Color.LightGray : Color.DarkGray));
+                        Draw.Rect(origin + (new Vector2(j, i) * stickerSpacing), stickerSpacing+1, stickerSpacing+1, (highlight == RubiksLogic.HighlightLevel.Primary ? Color.White : Color.Gray));
                     }
                 }
                 RubiksLogic.CubeColors color = state.Cube[(int)face, i, j];

@@ -8,7 +8,7 @@ local rubiksWatchtower = {
         {
             name = "rubiks_watchtower",
             data = {
-                cubeName = "Cube0"
+                cubeName = ""
             }
         }
     },

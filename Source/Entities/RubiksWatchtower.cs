@@ -44,6 +44,13 @@ public class RubiksWatchtower : Entity {
     private readonly string cubeName;
 
     private RubiksCube cube;
+    private int size;
+    private RubiksLogic.AbsoluteFaces? mySelectedFace;
+    private RubiksLogic.AbsoluteFaces? currentFace;
+    private RubiksLogic.AbsoluteFaces? pendingFace;
+    private int mySelectedLayer = 0;
+    private int currentLayer = 0;
+    private int maxLayer;
     private Vector2 CameraTarget;
     public Sprite sprite;
     public TalkComponent talk;
@@ -54,7 +61,7 @@ public class RubiksWatchtower : Entity {
     public RubiksWatchtower(EntityData data, Vector2 offset)
         : base(data.Position + offset)
     {
-        cubeName = data.String("cubeName", "Cube0");
+        cubeName = data.String("cubeName", "");
         base.Depth = -8500;
 		Add (talk = new TalkComponent (new Rectangle (-24, -8, 48, 8), new Vector2 (-0.5f, -20f), Interact));
         talk.PlayerMustBeFacing = false;
@@ -68,6 +75,11 @@ public class RubiksWatchtower : Entity {
     {
         base.Awake(scene);
         cube = RubiksCube.Find(scene, cubeName);
+        if (cube is not null)
+        {
+            size = cube.state.Size;
+	        maxLayer = (int)(Math.Ceiling(size / 2.0) - 1);
+        }
     }
 
     public override void Removed (Scene scene)
@@ -157,13 +169,19 @@ public class RubiksWatchtower : Entity {
 			level.ScreenPadding = (int)(Ease.CubeInOut (hud.Easer) * 16f);
 			yield return null;
 		}
-		Vector2 cam = level.Camera.Position;
-		Vector2 speed = Vector2.Zero;
+        Vector2 cam = level.Camera.Position;
+        /*
+        Vector2 speed = Vector2.Zero;
 		Vector2 lastDir = Vector2.Zero;
 		Vector2 camStart = level.Camera.Position;
-		Vector2 camStartCenter = camStart + new Vector2 (160f, 90f);
+        Vector2 camStartCenter = camStart + new Vector2(160f, 90f);
+		*/
 
-        while (!Input.MenuCancel.Pressed && !Input.MenuConfirm.Pressed && !Input.Dash.Pressed && !Input.Jump.Pressed && interacting)
+        mySelectedFace = null;
+		currentFace = null;
+		mySelectedLayer = 0;
+
+        while (!Input.MenuCancel.Pressed && interacting)
         {
 			Vector2 target = CameraTarget - new Vector2(160, 90);
 			target.X = Calc.Clamp( target.X, level.Bounds.Left, level.Bounds.Right - 320);
@@ -171,9 +189,18 @@ public class RubiksWatchtower : Entity {
 
             level.Camera.Position = Calc.Approach( level.Camera.Position, target, 600f * Engine.DeltaTime);
 
-            HandleInputs();
+            if (cube is not null)
+            {
+				HandleInputs();
+            }
 
             yield return null;
+        }
+        if (cube is not null)
+		{
+            cube.state.SelectedFace = null;
+            cube.state.SelectedLayer = null;
+            cube.state.SelectedDir = null;
         }
 
         PlayerSprite playerSprite2 = player.Sprite;
@@ -191,7 +218,7 @@ public class RubiksWatchtower : Entity {
         Audio.SetMusicParam ("escape", 0f);
 		level.ScreenPadding = 0f;
         level.ZoomSnap(Vector2.Zero, 1f);
-
+		Scene.Remove (hud);
         interacting = false;
 		player.StateMachine.State = 0;
 		yield return null;
@@ -199,6 +226,119 @@ public class RubiksWatchtower : Entity {
 
     private void HandleInputs()
     {
+        //Face selection inputs
+        Vector2 aim = Input.Aim.Value;
+        if (aim.X < 0)
+        {
+            if (aim.Y < 0)
+            {
+				currentFace = RubiksLogic.AbsoluteFaces.Back;
+            }
+            else if (aim.Y == 0){
+				currentFace = RubiksLogic.AbsoluteFaces.Left;
+            }
+            else
+            {
+				currentFace = null;
+            }
+        }
+        else if (aim.X == 0)
+        {
+            if (aim.Y < 0)
+			{
+				currentFace = RubiksLogic.AbsoluteFaces.Up;
+			}
+			else if (aim.Y > 0){
+				currentFace = RubiksLogic.AbsoluteFaces.Down;
+			}
+            else
+            {
+				currentFace = null;
+            }
+        }
+        else if (aim.X > 0)
+        {
+			if (aim.Y == 0)
+            {
+				currentFace = RubiksLogic.AbsoluteFaces.Right;
+            }
+            else if (aim.Y > 0){
+				currentFace = RubiksLogic.AbsoluteFaces.Front;
+            }
+            else
+            {
+				currentFace = null;
+            }
+        }
 
+        if (mySelectedFace is null && currentFace is not null)
+        {
+        	//make "first" selection
+            mySelectedFace = currentFace;
+            cube.RubiksSelect((RubiksLogic.AbsoluteFaces)mySelectedFace);
+        }
+        else if (currentFace is not null) //runs only with both non-null values for currentFace and mySelectedFace
+        {
+            if (currentFace != mySelectedFace)
+            {
+                if (currentFace != pendingFace)
+                {
+					pendingFace = currentFace;
+                }
+                else
+                {
+                    mySelectedFace = currentFace;
+                    cube.RubiksSelect((RubiksLogic.AbsoluteFaces)mySelectedFace);
+                    pendingFace = null;
+                }
+            }
+            else
+            {
+				pendingFace = null;
+            }
+        }
+
+        // Layer selection inputs
+        if (WrenbowHelperModule.Settings.RubiiksWatchtowerIncrementLayer.Pressed)
+        {
+            currentLayer++;
+        }
+        else if (WrenbowHelperModule.Settings.RubiiksWatchtowerDecrementLayer.Pressed)
+        {
+			currentLayer--;
+        }
+        if (currentLayer > maxLayer)
+        {
+			currentLayer = 0;
+        }
+        if (currentLayer < 0)
+        {
+			currentLayer = maxLayer;
+        }
+        if (currentLayer != mySelectedLayer)
+        {
+            mySelectedLayer = currentLayer;
+            cube.RubiksSelect(mySelectedLayer);
+        }
+
+        //turn inputs
+        if (WrenbowHelperModule.Settings.RubiiksWatchtowerClockwiseTurn.Pressed)
+        {
+            cube.RubiksSelect(RubiksLogic.TurnDir.Clockwise);
+            if (cube.RubiksTurn())
+            {
+                cube.RubiksSelect((RubiksLogic.AbsoluteFaces)mySelectedFace);
+                cube.RubiksSelect((int)mySelectedLayer);
+            }
+        }
+        else if (WrenbowHelperModule.Settings.RubiiksWatchtowerWiddershinsTurn.Pressed)
+        {
+			cube.RubiksSelect(RubiksLogic.TurnDir.Widdershins);
+            if (cube.RubiksTurn())
+            {
+                cube.RubiksSelect((RubiksLogic.AbsoluteFaces)mySelectedFace);
+                cube.RubiksSelect((int)mySelectedLayer);
+            }
+        }
     }
 }

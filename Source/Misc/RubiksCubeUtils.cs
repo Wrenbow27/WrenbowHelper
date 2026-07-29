@@ -172,7 +172,7 @@ public static class RubiksLogic
 
     public static void DoTurn(RubiksState state, RubiksTurn turn)
     {
-        if (turn.Depth > Math.Ceiling(state.Size / 2.0) - 1.0)
+        if (turn.Depth > (int)(Math.Ceiling(state.Size / 2.0) - 1))
         {
             throw new ArgumentOutOfRangeException("WrenbowHelper_RubiksCube: Invalid turn depth for cube size");
         }
