@@ -179,7 +179,8 @@ public class RubiksWatchtower : Entity {
 
         mySelectedFace = null;
 		currentFace = null;
-		mySelectedLayer = 0;
+        mySelectedLayer = 0;
+        cube?.RubiksSelect(mySelectedLayer);
 
         while (!Input.MenuCancel.Pressed && interacting)
         {
