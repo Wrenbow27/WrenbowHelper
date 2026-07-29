@@ -1,5 +1,5 @@
 - Name: WrenbowHelper
-  Version: 1.1.2
+  Version: 1.1.3
   DLL: bin/WrenbowHelper.dll
   Dependencies:
     - Name: EverestCore

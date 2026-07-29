@@ -31,6 +31,17 @@ local turnRubiksCubeTrigger = {
             options = operations
         }
     },
+    fieldOrder = {
+        "x",
+        "y",
+        "width",
+        "height",
+        "face",
+        "layer",
+        "direction",
+        "cubeName",
+        "operation"      
+    },
 }
 
 return turnRubiksCubeTrigger

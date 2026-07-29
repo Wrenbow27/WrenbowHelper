@@ -37,6 +37,18 @@ local rubiksCube = {
             fieldType = "string"
         }
     },
+    fieldOrder = {
+        "x",
+        "y",
+        "size",
+        "displayType",
+        "scrambleLength",
+        "startScrambled",
+        "solvedFlag",
+        "lockOnSolve",
+        "cubeName",
+        "persistent"      
+    },
 }
 
 return rubiksCube
