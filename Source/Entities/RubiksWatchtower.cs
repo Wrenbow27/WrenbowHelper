@@ -233,42 +233,92 @@ public class RubiksWatchtower : Entity {
         {
             if (aim.Y < 0)
             {
-				currentFace = RubiksLogic.AbsoluteFaces.Back;
+                switch (cube.displayType) //UpLeft
+                {
+                    case "NetL":
+                        currentFace = (WrenbowHelperSettings.RubiksWatchtowerInvertDiagonals ?
+                                        null:
+                                        RubiksLogic.AbsoluteFaces.Back);
+                        break;
+                    case "NetR":
+                        currentFace = (WrenbowHelperSettings.RubiksWatchtowerInvertDiagonals ?
+                                        RubiksLogic.AbsoluteFaces.Front:
+                                        null);
+                        break;
+                }
             }
             else if (aim.Y == 0){
-				currentFace = RubiksLogic.AbsoluteFaces.Left;
+				currentFace = RubiksLogic.AbsoluteFaces.Left;   //Left
             }
             else
             {
-				currentFace = null;
+                switch (cube.displayType) //DownLeft
+                {
+                    case "NetL":
+                        currentFace = (WrenbowHelperSettings.RubiksWatchtowerInvertDiagonals ?
+                                        RubiksLogic.AbsoluteFaces.Back:
+                                        null);
+                        break;
+                    case "NetR":
+                        currentFace = (WrenbowHelperSettings.RubiksWatchtowerInvertDiagonals ?
+                                        null:
+                                        RubiksLogic.AbsoluteFaces.Front);
+                        break;
+                }
             }
         }
         else if (aim.X == 0)
         {
             if (aim.Y < 0)
 			{
-				currentFace = RubiksLogic.AbsoluteFaces.Up;
+				currentFace = RubiksLogic.AbsoluteFaces.Up;   //Up
 			}
-			else if (aim.Y > 0){
-				currentFace = RubiksLogic.AbsoluteFaces.Down;
+            else if (aim.Y == 0)
+            {
+                currentFace = null;   //Neutral
 			}
             else
             {
-				currentFace = null;
+				currentFace = RubiksLogic.AbsoluteFaces.Down;   //Down
             }
         }
         else if (aim.X > 0)
         {
-			if (aim.Y == 0)
+            if (aim.Y < 0)
             {
-				currentFace = RubiksLogic.AbsoluteFaces.Right;
+                switch (cube.displayType) //UpRight
+                {
+                    case "NetL":
+                        currentFace = (WrenbowHelperSettings.RubiksWatchtowerInvertDiagonals ?
+                                        RubiksLogic.AbsoluteFaces.Front:
+                                        null);
+                        break;
+                    case "NetR":
+                        currentFace = (WrenbowHelperSettings.RubiksWatchtowerInvertDiagonals ?
+                                        null:
+                                        RubiksLogic.AbsoluteFaces.Back);
+                        break;
+                }
             }
-            else if (aim.Y > 0){
-				currentFace = RubiksLogic.AbsoluteFaces.Front;
+            else if (aim.Y == 0){
+				currentFace = RubiksLogic.AbsoluteFaces.Right;   //Right
             }
             else
             {
-				currentFace = null;
+                switch (cube.displayType) //DownRight
+                {
+                    case "NetL":
+                        currentFace = (WrenbowHelperSettings.RubiksWatchtowerInvertDiagonals ?
+                                        null:
+                                        RubiksLogic.AbsoluteFaces.Front);
+                        break;
+                    case "NetR":
+                        currentFace = null;
+                        currentFace = (WrenbowHelperSettings.RubiksWatchtowerInvertDiagonals ?
+                                        RubiksLogic.AbsoluteFaces.Back:
+                                        null);
+                        break;
+                }
             }
         }
 
@@ -300,11 +350,11 @@ public class RubiksWatchtower : Entity {
         }
 
         // Layer selection inputs
-        if (WrenbowHelperModule.Settings.RubiiksWatchtowerIncrementLayer.Pressed)
+        if (WrenbowHelperModule.Settings.RubiksWatchtowerIncrementLayer.Pressed)
         {
             currentLayer++;
         }
-        else if (WrenbowHelperModule.Settings.RubiiksWatchtowerDecrementLayer.Pressed)
+        else if (WrenbowHelperModule.Settings.RubiksWatchtowerDecrementLayer.Pressed)
         {
 			currentLayer--;
         }
@@ -323,7 +373,7 @@ public class RubiksWatchtower : Entity {
         }
 
         //turn inputs
-        if (WrenbowHelperModule.Settings.RubiiksWatchtowerClockwiseTurn.Pressed)
+        if (WrenbowHelperModule.Settings.RubiksWatchtowerClockwiseTurn.Pressed)
         {
             cube.RubiksSelect(RubiksLogic.TurnDir.Clockwise);
             if (cube.RubiksTurn())
@@ -332,7 +382,7 @@ public class RubiksWatchtower : Entity {
                 cube.RubiksSelect((int)mySelectedLayer);
             }
         }
-        else if (WrenbowHelperModule.Settings.RubiiksWatchtowerWiddershinsTurn.Pressed)
+        else if (WrenbowHelperModule.Settings.RubiksWatchtowerWiddershinsTurn.Pressed)
         {
 			cube.RubiksSelect(RubiksLogic.TurnDir.Widdershins);
             if (cube.RubiksTurn())

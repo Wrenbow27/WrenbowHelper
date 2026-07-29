@@ -16,7 +16,7 @@ public class RubiksCube : Entity {
     private readonly bool startScrambled;
     private readonly int scrambleLength;
     private readonly string solvedFlag;
-    private readonly string displayType;
+    internal readonly string displayType;
     private readonly bool lockOnSolve;
     private readonly bool persistent;
     private readonly string cubeName;
