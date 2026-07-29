@@ -11,6 +11,7 @@ namespace Celeste.Mod.WrenbowHelper;
 public class RubiksState
 {
     public RubiksLogic.CubeColors[,,] Cube { get; }
+    internal bool Persistent;
     public int Size { get; }
     public bool IsSolved => CheckSolved();
     public RubiksLogic.HighlightLevel[,,] Highlights;
@@ -46,6 +47,12 @@ public class RubiksState
             UpdateHighlights(selectedFace, selectedLayer);
         }
     }
+
+    public Random RNG { get; } = new();
+    public ulong endScrambleAnimFrame = Engine.FrameCounter;
+    public string SolvedFlag { get; internal set; }
+    public bool? FlagUpdatePending { get; internal set; }
+    public bool LockOnSolve { get; internal set; }
 
     public RubiksState(int size)
     {
@@ -96,6 +103,75 @@ public class RubiksState
         {
             Array.Clear(Highlights, 0, Highlights.Length);
         }
+    }
+    public bool RubiksTurn(RubiksLogic.RubiksTurn turn)
+    {
+        if (IsLocked)
+        {
+            //fail turn
+            return false;
+        }
+        RubiksLogic.DoTurn(this, turn);
+        RubiksSolved();
+        return true;
+    }
+
+    public bool RubiksTurn()
+    {
+        if (IsLocked || !SelectedFace.HasValue || !SelectedLayer.HasValue || !SelectedDir.HasValue)
+        {
+            //fail turn
+            return false;
+        }
+        RubiksLogic.RubiksTurn turn = new WrenbowHelper.RubiksLogic.RubiksTurn(
+                    SelectedFace ?? RubiksLogic.AbsoluteFaces.Down,
+                    SelectedDir ?? RubiksLogic.TurnDir.Clockwise,
+                    SelectedLayer ?? 0);
+        RubiksLogic.DoTurn(this, turn);
+        RubiksSolved();
+        return true;
+    }
+
+    public void RubiksScramble(int scrambleLength)
+    {
+        endScrambleAnimFrame = Engine.FrameCounter + 30;
+        RubiksLogic.Scramble(this, scrambleLength, RNG);
+        RubiksSolved();
+    }
+    public void RubiksSelect(RubiksLogic.AbsoluteFaces face)
+    {
+        SelectedFace = face;
+    }
+
+    public void RubiksSelect(int layer)
+    {
+        SelectedLayer = layer;
+    }
+
+    public void RubiksSelect(RubiksLogic.TurnDir dir)
+    {
+        SelectedDir = dir;
+    }
+
+    public bool RubiksSolved()
+    {
+        bool isSolved = IsSolved;
+
+        if (!string.IsNullOrEmpty(SolvedFlag))
+        {
+            FlagUpdatePending = isSolved;
+        }
+        if (LockOnSolve && isSolved)
+        {
+            IsLocked = true;
+        }
+        return isSolved;
+    }
+
+    public static RubiksState Find(string cubeName)
+    {
+        WrenbowHelperModule.Session.RubiksCubes.TryGetValue(cubeName, out RubiksState state);
+        return state;
     }
 }
 

@@ -41,9 +41,10 @@ public class RubiksWatchtower : Entity {
     }
 
     //lonn declared
+    private readonly string cubeLayout;
     private readonly string cubeName;
 
-    private RubiksCube cube;
+    private RubiksState state;
     private int size;
     private RubiksLogic.AbsoluteFaces? mySelectedFace;
     private RubiksLogic.AbsoluteFaces? currentFace;
@@ -61,7 +62,8 @@ public class RubiksWatchtower : Entity {
     public RubiksWatchtower(EntityData data, Vector2 offset)
         : base(data.Position + offset)
     {
-        cubeName = data.String("cubeName", "");
+        cubeLayout = data.String("cubeLayouts", "NetL");
+        cubeName = data.String("cubeName", "cube0");
         base.Depth = -8500;
 		Add (talk = new TalkComponent (new Rectangle (-24, -8, 48, 8), new Vector2 (-0.5f, -20f), Interact));
         talk.PlayerMustBeFacing = false;
@@ -74,10 +76,10 @@ public class RubiksWatchtower : Entity {
     public override void Awake(Scene scene)
     {
         base.Awake(scene);
-        cube = RubiksCube.Find(scene, cubeName);
-        if (cube is not null)
+        state = RubiksState.Find(cubeName);
+        if (state is not null)
         {
-            size = cube.state.Size;
+            size = state.Size;
 	        maxLayer = (int)(Math.Ceiling(size / 2.0) - 1);
         }
     }
@@ -180,7 +182,7 @@ public class RubiksWatchtower : Entity {
         mySelectedFace = null;
 		currentFace = null;
         mySelectedLayer = 0;
-        cube?.RubiksSelect(mySelectedLayer);
+        state?.RubiksSelect(mySelectedLayer);
 
         while (!Input.MenuCancel.Pressed && interacting)
         {
@@ -190,18 +192,18 @@ public class RubiksWatchtower : Entity {
 
             level.Camera.Position = Calc.Approach( level.Camera.Position, target, 600f * Engine.DeltaTime);
 
-            if (cube is not null)
+            if (state is not null)
             {
 				HandleInputs();
             }
 
             yield return null;
         }
-        if (cube is not null)
+        if (state is not null)
 		{
-            cube.state.SelectedFace = null;
-            cube.state.SelectedLayer = null;
-            cube.state.SelectedDir = null;
+            state.SelectedFace = null;
+            state.SelectedLayer = null;
+            state.SelectedDir = null;
         }
 
         PlayerSprite playerSprite2 = player.Sprite;
@@ -233,7 +235,7 @@ public class RubiksWatchtower : Entity {
         {
             if (aim.Y < 0)
             {
-                switch (cube.displayType) //UpLeft
+                switch (cubeLayout) //UpLeft
                 {
                     case "NetL":
                         currentFace = (WrenbowHelperSettings.RubiksWatchtowerInvertDiagonals ?
@@ -252,7 +254,7 @@ public class RubiksWatchtower : Entity {
             }
             else
             {
-                switch (cube.displayType) //DownLeft
+                switch (cubeLayout) //DownLeft
                 {
                     case "NetL":
                         currentFace = (WrenbowHelperSettings.RubiksWatchtowerInvertDiagonals ?
@@ -286,7 +288,7 @@ public class RubiksWatchtower : Entity {
         {
             if (aim.Y < 0)
             {
-                switch (cube.displayType) //UpRight
+                switch (cubeLayout) //UpRight
                 {
                     case "NetL":
                         currentFace = (WrenbowHelperSettings.RubiksWatchtowerInvertDiagonals ?
@@ -305,7 +307,7 @@ public class RubiksWatchtower : Entity {
             }
             else
             {
-                switch (cube.displayType) //DownRight
+                switch (cubeLayout) //DownRight
                 {
                     case "NetL":
                         currentFace = (WrenbowHelperSettings.RubiksWatchtowerInvertDiagonals ?
@@ -313,7 +315,6 @@ public class RubiksWatchtower : Entity {
                                         RubiksLogic.AbsoluteFaces.Front);
                         break;
                     case "NetR":
-                        currentFace = null;
                         currentFace = (WrenbowHelperSettings.RubiksWatchtowerInvertDiagonals ?
                                         RubiksLogic.AbsoluteFaces.Back:
                                         null);
@@ -326,7 +327,7 @@ public class RubiksWatchtower : Entity {
         {
         	//make "first" selection
             mySelectedFace = currentFace;
-            cube.RubiksSelect((RubiksLogic.AbsoluteFaces)mySelectedFace);
+            state.RubiksSelect((RubiksLogic.AbsoluteFaces)mySelectedFace);
         }
         else if (currentFace is not null) //runs only with both non-null values for currentFace and mySelectedFace
         {
@@ -339,7 +340,7 @@ public class RubiksWatchtower : Entity {
                 else
                 {
                     mySelectedFace = currentFace;
-                    cube.RubiksSelect((RubiksLogic.AbsoluteFaces)mySelectedFace);
+                    state.RubiksSelect((RubiksLogic.AbsoluteFaces)mySelectedFace);
                     pendingFace = null;
                 }
             }
@@ -369,26 +370,28 @@ public class RubiksWatchtower : Entity {
         if (currentLayer != mySelectedLayer)
         {
             mySelectedLayer = currentLayer;
-            cube.RubiksSelect(mySelectedLayer);
+            state.RubiksSelect(mySelectedLayer);
         }
 
         //turn inputs
         if (WrenbowHelperModule.Settings.RubiksWatchtowerClockwiseTurn.Pressed)
         {
-            cube.RubiksSelect(RubiksLogic.TurnDir.Clockwise);
-            if (cube.RubiksTurn())
+            state.RubiksSelect(RubiksLogic.TurnDir.Clockwise);
+            if (state.RubiksTurn())
             {
-                cube.RubiksSelect((RubiksLogic.AbsoluteFaces)mySelectedFace);
-                cube.RubiksSelect((int)mySelectedLayer);
+                Audio.Play("event:/WrenbowHelper/RubiksSFX", Position);
+                state.RubiksSelect((RubiksLogic.AbsoluteFaces)mySelectedFace);
+                state.RubiksSelect((int)mySelectedLayer);
             }
         }
         else if (WrenbowHelperModule.Settings.RubiksWatchtowerWiddershinsTurn.Pressed)
         {
-			cube.RubiksSelect(RubiksLogic.TurnDir.Widdershins);
-            if (cube.RubiksTurn())
+			state.RubiksSelect(RubiksLogic.TurnDir.Widdershins);
+            if (state.RubiksTurn())
             {
-                cube.RubiksSelect((RubiksLogic.AbsoluteFaces)mySelectedFace);
-                cube.RubiksSelect((int)mySelectedLayer);
+                Audio.Play("event:/WrenbowHelper/RubiksSFX", Position);
+                state.RubiksSelect((RubiksLogic.AbsoluteFaces)mySelectedFace);
+                state.RubiksSelect((int)mySelectedLayer);
             }
         }
     }

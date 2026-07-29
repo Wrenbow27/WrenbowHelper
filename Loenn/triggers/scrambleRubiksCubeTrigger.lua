@@ -4,7 +4,7 @@ local scrambleRubiksCubeTrigger = {
         {
             name = "scramble_rubiks_cube_trigger",
             data = {
-                cubeName = "",
+                cubeName = "cube0",
                 scrambleLength = 30,
                 doOnce = true
             }

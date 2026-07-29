@@ -1,4 +1,4 @@
-local displayTypes = {"NetL","NetR"}
+local cubeLayouts = {"NetL","NetR"}
 
 local rubiksCube = {
     name = "WrenbowHelper/RubiksCube",
@@ -10,11 +10,11 @@ local rubiksCube = {
             size = 3,
             startScrambled = true,
             scrambleLength = 30,
-            solvedFlag = "WrenbowHelper_RubiksCube0Solved",
-            displayType = "NetL",
+            solvedFlag = "WrenbowHelper_RubiksSolved_cube0",
+            cubeLayout = "NetL",
             lockOnSolve = true,
             persistent = true,
-            cubeName = ""
+            cubeName = "cube0"
             }
         }
     },
@@ -30,8 +30,8 @@ local rubiksCube = {
         solvedFlag = {
             fieldType = "string"
         },
-        displayType = {
-            options = displayTypes
+        cubeLayout = {
+            options = cubeLayouts
         },
         cubeName = {
             fieldType = "string"
@@ -41,7 +41,7 @@ local rubiksCube = {
         "x",
         "y",
         "size",
-        "displayType",
+        "cubeLayout",
         "scrambleLength",
         "startScrambled",
         "solvedFlag",

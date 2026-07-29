@@ -2,13 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Celeste.Mod.Entities;
+using FMOD.Studio;
 using Microsoft.Xna.Framework;
 using Monocle;
 
 namespace Celeste.Mod.WrenbowHelper.Entities;
 
 [CustomEntity("WrenbowHelper/RubiksCube")]
-[Tracked]
 
 public class RubiksCube : Entity {
     //lonn declared
@@ -16,12 +16,10 @@ public class RubiksCube : Entity {
     private readonly bool startScrambled;
     private readonly int scrambleLength;
     private readonly string solvedFlag;
-    internal readonly string displayType;
+    private readonly string cubeLayout;
     private readonly bool lockOnSolve;
     private readonly bool persistent;
     private readonly string cubeName;
-
-    //private CubeColors[,,] cube; //[face, row, column] (matrix convention)
     internal readonly RubiksState state;
 
     private MTexture sticker;
@@ -42,9 +40,9 @@ public class RubiksCube : Entity {
     private readonly Vector2[] facePositions;
 
     private bool queuedScramble = false;
-    private int scrambleAnimationTimer; //Qty of frames to play scramble animations for
     private bool isInitialized = false;
     private static readonly Random rng = new();
+    private EventInstance scrambleSFX;
 
     public RubiksCube(EntityData data, Vector2 offset)
         : base(data.Position + offset)
@@ -53,27 +51,31 @@ public class RubiksCube : Entity {
         startScrambled = data.Bool("startScrambled", true);
         scrambleLength = data.Int("scrambleLength", 30);
         solvedFlag = data.String("solvedFlag", "");
-        displayType = data.String("displayType", "NetL");
-        cubeName = data.String("cubeName", "");
+        cubeLayout = data.String("cubeLayouts", "NetL");
+        cubeName = data.String("cubeName", "cube0");
         persistent = data.Bool("persistent", true) && !string.IsNullOrEmpty(cubeName);
         lockOnSolve = data.Bool("lockOnSolve", true);
 
-        if (persistent && WrenbowHelperModule.Session.RubiksCubes.TryGetValue(cubeName, out RubiksState savedState))
+        if (WrenbowHelperModule.Session.RubiksCubes.TryGetValue(cubeName, out RubiksState savedState))
         {
             isInitialized = true;
             state = savedState;
+            persistent = state.Persistent;
         }
         else
         {
             state = new RubiksState(size);
+            state.Persistent = persistent;
+            state.SolvedFlag = solvedFlag;
+            state.LockOnSolve = lockOnSolve;
 
-            if (persistent)
+            if (!string.IsNullOrEmpty(cubeName))
             {
                 WrenbowHelperModule.Session.RubiksCubes[cubeName] = state;
             }
         }
 
-        faceSpacing = (stickerSpacing * size) + faceGap;
+        faceSpacing = (stickerSpacing * state.Size) + faceGap;
         facePositions = GetFacePositions();
     }
 
@@ -89,6 +91,8 @@ public class RubiksCube : Entity {
     public override void Update()
     {
         base.Update();
+
+        //Perform initial scramble
         if (!isInitialized)
         {
             isInitialized = true;
@@ -96,101 +100,29 @@ public class RubiksCube : Entity {
         if (queuedScramble)
         {
             queuedScramble = false;
-            RubiksScramble(scrambleLength);
+            state.RubiksScramble(scrambleLength);
         }
 
-        if (scrambleAnimationTimer > 0)
+        //Play scrambling audio
+        if (Engine.FrameCounter < state.endScrambleAnimFrame &&
+           (state.endScrambleAnimFrame - Engine.FrameCounter) % 3 == 0)
         {
-        scrambleAnimationTimer--;
-        if (scrambleAnimationTimer == 0)
+            if (scrambleSFX?.isValid() ?? false)
             {
-                state.IsLocked = false;
+                scrambleSFX.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                scrambleSFX.release();
+                scrambleSFX = null;
             }
-        }
-    }
 
-    public bool RubiksTurn(RubiksLogic.RubiksTurn turn)
-    {
-        if (state.IsLocked)
+            scrambleSFX = Audio.Play("event:/WrenbowHelper/RubiksSFX", Position);
+        }
+
+        //Update flag from state
+        if (state.FlagUpdatePending is not null)
         {
-            //fail turn
-            return false;
+            SceneAs<Level>().Session.SetFlag(state.SolvedFlag, state.FlagUpdatePending.Value);
+            state.FlagUpdatePending = null;
         }
-        RubiksLogic.DoTurn(state, turn);
-        Audio.Play("event:/WrenbowHelper/RubiksSFX", Position);
-        RubiksSolved();
-        return true;
-    }
-
-    public bool RubiksTurn()
-    {
-        if (state.IsLocked || !state.SelectedFace.HasValue || !state.SelectedLayer.HasValue || !state.SelectedDir.HasValue)
-        {
-            //fail turn
-            return false;
-        }
-        RubiksLogic.RubiksTurn turn = new WrenbowHelper.RubiksLogic.RubiksTurn(
-                    state.SelectedFace ?? RubiksLogic.AbsoluteFaces.Down,
-                    state.SelectedDir ?? RubiksLogic.TurnDir.Clockwise,
-                    state.SelectedLayer ?? 0);
-        RubiksLogic.DoTurn(state, turn);
-        Audio.Play("event:/WrenbowHelper/RubiksSFX", Position);
-        RubiksSolved();
-        return true;
-    }
-
-    public void RubiksSelect(RubiksLogic.AbsoluteFaces face)
-    {
-        state.SelectedFace = face;
-    }
-
-    public void RubiksSelect(int layer)
-    {
-        state.SelectedLayer = layer;
-    }
-
-    public void RubiksSelect(RubiksLogic.TurnDir dir)
-{
-    state.SelectedDir = dir;
-}
-
-    public void RubiksScramble(int scrambleLength)
-    {
-        state.IsLocked = true;
-        scrambleAnimationTimer = 30;
-        RubiksLogic.Scramble(state, scrambleLength, rng);
-        RubiksSolved();
-    }
-
-    public bool RubiksSolved()
-    {
-        bool isSolved = state.IsSolved;
-
-        if (!string.IsNullOrEmpty(solvedFlag))
-        {
-            SceneAs<Level>().Session.SetFlag(solvedFlag, isSolved);
-        }
-        if (lockOnSolve && isSolved)
-        {
-            state.IsLocked = true;
-        }
-        return isSolved;
-    }
-
-    public static RubiksCube Find(Scene scene, string cubeName)
-    {
-        if (string.IsNullOrEmpty(cubeName))
-        {
-            return scene.Tracker.GetEntity<RubiksCube>();
-
-        }
-
-        foreach (RubiksCube cube in scene.Tracker.GetEntities<RubiksCube>())
-        {
-            if (cube.cubeName == cubeName)
-                return cube;
-        }
-        return null;
     }
 
     public override void Render()
@@ -205,9 +137,18 @@ public class RubiksCube : Entity {
         DrawFace(RubiksLogic.AbsoluteFaces.Back, Position + facePositions[5]);
     }
 
+    public override void Removed(Scene scene)
+    {
+        base.Removed(scene);
+        if (!state.Persistent)
+        {
+            WrenbowHelperModule.Session.RubiksCubes.Remove(cubeName);
+        }
+    }
+
     private void DrawFace(RubiksLogic.AbsoluteFaces face, Vector2 origin)
     {
-        Draw.Rect(origin.X, origin.Y, size * stickerSpacing + 1, size * stickerSpacing + 1, Color.Black);
+        Draw.Rect(origin.X, origin.Y, state.Size * stickerSpacing + 1, state.Size * stickerSpacing + 1, Color.Black);
         for (int i = 0; i < state.Size; i++)
         {
             for (int j = 0; j < state.Size; j++)
@@ -229,9 +170,9 @@ public class RubiksCube : Entity {
 
     private Color GetStickerColor(RubiksLogic.CubeColors color)
     {
-        if (scrambleAnimationTimer > 0 && isInitialized)
+        if (Engine.FrameCounter < state.endScrambleAnimFrame && isInitialized)
         {
-            return StickerColors[rng.Next(0,6)];
+            return StickerColors[rng.Next(0, 6)];
         }
         else
         {
@@ -242,7 +183,7 @@ public class RubiksCube : Entity {
 
     private Vector2[] GetFacePositions()
     {
-        switch (displayType)
+        switch (cubeLayout)
         {
             case "NetL":
                 return [new Vector2(2 * faceSpacing, 2 * faceSpacing),
@@ -260,6 +201,6 @@ public class RubiksCube : Entity {
                         new Vector2(faceSpacing, faceSpacing),
                         new Vector2(3 * faceSpacing, 1 * faceSpacing),];
         }
-        throw new InvalidOperationException("WrenbowHelper_RubiksCube: Invalid display type");
+        throw new InvalidOperationException("WrenbowHelper_RubiksCube: Invalid cube Layout");
     }
 }

@@ -11,7 +11,7 @@ local turnRubiksCubeTrigger = {
                 face = "Down",
                 layer = 0,
                 direction = "Clockwise",
-                cubeName = "",
+                cubeName = "cube0",
                 operation = "All"
             }
         },

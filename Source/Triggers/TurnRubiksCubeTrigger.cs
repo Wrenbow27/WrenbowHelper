@@ -14,7 +14,7 @@ public class TurnRubiksCubeTrigger : Trigger {
     private readonly string operation;
     private readonly string cubeName;
 
-    private RubiksCube cube;
+    private RubiksState state;
 
     private WrenbowHelper.RubiksLogic.RubiksTurn turn;
 
@@ -24,7 +24,7 @@ public class TurnRubiksCubeTrigger : Trigger {
         layer = data.Int("layer", 0);
         direction = data.String("direction", "Clockwise");
         operation = data.String("operation", "All");
-        cubeName = data.String("cubeName", "");
+        cubeName = data.String("cubeName", "cube0");
 
         turn = new WrenbowHelper.RubiksLogic.RubiksTurn(
             Enum.Parse<WrenbowHelper.RubiksLogic.AbsoluteFaces>(face),
@@ -35,7 +35,7 @@ public class TurnRubiksCubeTrigger : Trigger {
     public override void Awake(Scene scene)
     {
         base.Awake(scene);
-        cube = RubiksCube.Find(scene, cubeName);
+        state = RubiksState.Find(cubeName);
     }
 
     public override void OnEnter(Player player)
@@ -47,23 +47,29 @@ public class TurnRubiksCubeTrigger : Trigger {
                     Enum.Parse<WrenbowHelper.RubiksLogic.AbsoluteFaces>(face),
                     Enum.Parse<WrenbowHelper.RubiksLogic.TurnDir>(direction),
                     layer);
-                cube?.RubiksTurn(turn);
+                if (state?.RubiksTurn(turn) ?? false)
+                {
+                    Audio.Play("event:/WrenbowHelper/RubiksSFX", Position);
+                }
                 return;
 
             case "Select Face":
-                cube?.RubiksSelect(Enum.Parse<WrenbowHelper.RubiksLogic.AbsoluteFaces>(face));
+                state?.RubiksSelect(Enum.Parse<WrenbowHelper.RubiksLogic.AbsoluteFaces>(face));
                 return;
 
             case "Select Layer":
-                cube?.RubiksSelect(layer);
+                state?.RubiksSelect(layer);
                 return;
 
             case "Select Direction":
-                cube?.RubiksSelect(Enum.Parse<WrenbowHelper.RubiksLogic.TurnDir>(direction));
+                state?.RubiksSelect(Enum.Parse<WrenbowHelper.RubiksLogic.TurnDir>(direction));
                 return;
 
             case "Turn Selection":
-                cube?.RubiksTurn();
+                if (state?.RubiksTurn() ?? false)
+                {
+                    Audio.Play("event:/WrenbowHelper/RubiksSFX", Position);
+                }
                 return;
         }
     }

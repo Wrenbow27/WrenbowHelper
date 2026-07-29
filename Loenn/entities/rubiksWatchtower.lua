@@ -1,6 +1,8 @@
 local drawableSprite = require("structs.drawable_sprite")
 local drawableRect = require("structs.drawable_rectangle")
 
+local cubeLayouts = {"NetL","NetR"}
+
 local rubiksWatchtower = {
     name = "WrenbowHelper/RubiksWatchtower",
 
@@ -8,13 +10,17 @@ local rubiksWatchtower = {
         {
             name = "rubiks_watchtower",
             data = {
-                cubeName = ""
+                cubeName = "cube0",
+                displayType = "NetL"
             }
         }
     },
     fieldInformation = {
         cubeName = {
             fieldType = "string"
+        },
+        cubeLayout = {
+            options = cubeLayouts
         }
     },
     nodeLimits = {1, 1},

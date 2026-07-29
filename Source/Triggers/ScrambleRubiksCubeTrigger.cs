@@ -10,13 +10,13 @@ namespace Celeste.Mod.WrenbowHelper.Triggers;
 public class ScrambleRubiksCubeTrigger : Trigger {
     private readonly string cubeName;
 
-    private RubiksCube cube;
+    private RubiksState state;
     private int scrambleLength;
     private bool doOnce;
 
     public ScrambleRubiksCubeTrigger(EntityData data, Vector2 offset) : base(data, offset)
     {
-        cubeName = data.String("cubeName", "");
+        cubeName = data.String("cubeName", "cube0");
         scrambleLength = data.Int("scrambleLength", 0);
         doOnce = data.Bool("doOnce", true);
     }
@@ -24,14 +24,14 @@ public class ScrambleRubiksCubeTrigger : Trigger {
     public override void Awake(Scene scene)
     {
         base.Awake(scene);
-        cube = RubiksCube.Find(scene, cubeName);
+        state = RubiksState.Find(cubeName);
     }
 
     public override void OnEnter(Player player)
     {
-        if (cube is not null && !cube.state.IsLocked)
+        if (state is not null && !state.IsLocked)
         {
-            cube.RubiksScramble(scrambleLength);
+            state.RubiksScramble(scrambleLength);
             if (doOnce)
             {
                 RemoveSelf();
