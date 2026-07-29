@@ -54,7 +54,7 @@ triggers.WrenbowHelper/TurnRubiksCubeTrigger.placements.name.turn_rubiks_cube_tr
 triggers.WrenbowHelper/TurnRubiksCubeTrigger.placements.description.turn_rubiks_cube_trigger=Can either perform a specific turn, or select a single component of a turn to be applied later
 triggers.WrenbowHelper/TurnRubiksCubeTrigger.attributes.description.layer=0 is the outermost layer, and it counts up moving inward. This can not turn slices past the middle of the cube relative to the turn face
 triggers.WrenbowHelper/TurnRubiksCubeTrigger.attributes.description.cubeName=Cube identifier for direct control (leave blank for automatic pairing)
-triggers.WrenbowHelper/TurnRubiksCubeTrigger.attributes.description.operation=Select ___: Select a single turn component for the cube\nTurn Selection: If a face, layer, and direction are set, perform the turn\nAll: Bypass the selection system and apply the turn directly
+triggers.WrenbowHelper/TurnRubiksCubeTrigger.attributes.description.operation=Select ___: Select a single turn component for the cube\nTurn Selection: If a face, layer, and direction have been selected, perform the turn\nAll: Bypass the selection system and apply the turn directly
 
 triggers.WrenbowHelper/ScrambleRubiksCubeTrigger.placements.name.scramble_rubiks_cube_trigger=Scramble Rubiks Cube Trigger
 triggers.WrenbowHelper/ScrambleRubiksCubeTrigger.placements.description.scramble_rubiks_cube_trigger=Applies a configurable amount of random turns to a Rubiks Cube
