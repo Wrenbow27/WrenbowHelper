@@ -43,6 +43,7 @@ entities.WrenbowHelper/RubiksCube.attributes.description.solvedFlag=Flag that wi
 entities.WrenbowHelper/RubiksCube.attributes.description.lockOnSolve=Prevents the cube from being turned once solved
 entities.WrenbowHelper/RubiksCube.attributes.description.cubeName=Identifier to store the puzzle state to/reflect from
 entities.WrenbowHelper/RubiksCube.attributes.description.persistent=Whether to keep the cube state saved when leaving the screen
+entities.WrenbowHelper/RubiksCube.attributes.description.colorPalette=Set of 6 colors to shift the sticker texture by\nA colorblind option is always available to the player as a mod setting to give each "color" a unique icon as well
 
 # Rubiks Watchtower
 entities.WrenbowHelper/RubiksWatchtower.placements.name.rubiks_watchtower=Rubiks Watchtower

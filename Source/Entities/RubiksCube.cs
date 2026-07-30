@@ -20,11 +20,12 @@ public class RubiksCube : Entity {
     private readonly bool lockOnSolve;
     private readonly bool persistent;
     private readonly string cubeName;
+    private readonly Color[] colorPalette;
     internal readonly RubiksState state;
 
     private MTexture sticker;
 
-    private static readonly Color[] StickerColors =
+    private readonly Color[] StickerColors =
     {
         Color.White,
         Color.Yellow,
@@ -51,7 +52,7 @@ public class RubiksCube : Entity {
         startScrambled = data.Bool("startScrambled", true);
         scrambleLength = data.Int("scrambleLength", 30);
         solvedFlag = data.String("solvedFlag", "");
-        cubeLayout = data.String("cubeLayouts", "NetL");
+        cubeLayout = data.String("cubeLayout", "NetL");
         cubeName = data.String("cubeName", "cube0");
         persistent = data.Bool("persistent", true) && !string.IsNullOrEmpty(cubeName);
         lockOnSolve = data.Bool("lockOnSolve", true);
@@ -61,6 +62,7 @@ public class RubiksCube : Entity {
             isInitialized = true;
             state = savedState;
             persistent = state.Persistent;
+            colorPalette = state.ColorPalette;
         }
         else
         {
@@ -69,11 +71,21 @@ public class RubiksCube : Entity {
             state.SolvedFlag = solvedFlag;
             state.LockOnSolve = lockOnSolve;
 
+            string[] colorsAsStrings = data.Attr("colorPalette", "FFFFFF,FFFF00,0000FF,008000,FF0000,FFA500").Split(',');
+            colorPalette = new Color[6];
+            for (int i = 0; i < 6; i++)
+            {
+                colorPalette[i] = Calc.HexToColor(colorsAsStrings[i]);
+            }
+            state.ColorPalette = colorPalette;
+
             if (!string.IsNullOrEmpty(cubeName))
             {
                 WrenbowHelperModule.Session.RubiksCubes[cubeName] = state;
             }
         }
+
+        StickerColors = state.ColorPalette;
 
         faceSpacing = (stickerSpacing * state.Size) + faceGap;
         facePositions = GetFacePositions();
