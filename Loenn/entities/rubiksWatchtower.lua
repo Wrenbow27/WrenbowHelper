@@ -24,6 +24,7 @@ local rubiksWatchtower = {
         }
     },
     nodeLimits = {1, 1},
+    nodeLineRenderType = "line",
     texture = "objects/lookout/lookout05",
     justification = {0.5, 1.0}
 }

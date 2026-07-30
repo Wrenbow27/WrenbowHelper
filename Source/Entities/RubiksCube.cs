@@ -57,6 +57,9 @@ public class RubiksCube : Entity {
         persistent = data.Bool("persistent", true) && !string.IsNullOrEmpty(cubeName);
         lockOnSolve = data.Bool("lockOnSolve", true);
 
+
+        base.Depth = 1500;
+
         if (WrenbowHelperModule.Session.RubiksCubes.TryGetValue(cubeName, out RubiksState savedState))
         {
             isInitialized = true;
