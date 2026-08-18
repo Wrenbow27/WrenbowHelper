@@ -32,10 +32,11 @@ public class ScrambleRubiksCubeTrigger : Trigger {
         if (state is not null && !state.IsLocked)
         {
             state.RubiksScramble(scrambleLength);
-            if (doOnce)
-            {
-                RemoveSelf();
-            }
+
+        }
+        if (doOnce)
+        {
+            RemoveSelf();
         }
     }
 }
