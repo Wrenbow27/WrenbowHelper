@@ -18,7 +18,7 @@ entities.WrenbowHelper/DreamJumpRefill.placements.description.dream_jump_refill=
 entities.WrenbowHelper/DreamJumpRefill.attributes.description.earlyLeniencyFrames=Extra leniency coyote frames to be applied on dream block exit. These can carry over to a second non-buffered jump
 entities.WrenbowHelper/DreamJumpRefill.attributes.description.lateLeniencyFrames=Extra leniency coyote frames to be applied after the first non-buffered jump
 entities.WrenbowHelper/DreamJumpRefill.attributes.description.persistent=Allows the stored jump to be retained past the next dream block exit if not used
-entities.WrenbowHelper/DreamJumpRefill.attributes.description.trailIndicator=Whether to show a trail when a dream jump is either stored or usable. If custom indication is desired, the flag "WrenbowHelper_HasDreamJump" follows this behavior
+entities.WrenbowHelper/DreamJumpRefill.attributes.description.trailIndicator=Whether to show a trail when a dream jump is either stored or usable
 entities.WrenbowHelper/DreamJumpRefill.attributes.description.trailColor=Color of the indicator trail
 
 # Set LiftSpeed Trigger
@@ -43,7 +43,7 @@ entities.WrenbowHelper/RubiksCube.attributes.description.solvedFlag=Flag that wi
 entities.WrenbowHelper/RubiksCube.attributes.description.lockOnSolve=Prevents the cube from being turned once solved
 entities.WrenbowHelper/RubiksCube.attributes.description.cubeName=Identifier to store the puzzle state to/reflect from
 entities.WrenbowHelper/RubiksCube.attributes.description.persistent=Whether to keep the cube state saved when leaving the screen
-entities.WrenbowHelper/RubiksCube.attributes.description.colorPalette=Set of 6 colors to shift the sticker texture by\nA colorblind option is always available to the player as a mod setting to give each "color" a unique icon as well
+entities.WrenbowHelper/RubiksCube.attributes.description.colorPalette=Set of 6 colors to shift the sticker texture by\nA colorblind option is always available to the player as a mod setting to give each sticker set a unique icon
 
 # Rubiks Watchtower
 entities.WrenbowHelper/RubiksWatchtower.placements.name.rubiks_watchtower=Rubiks Watchtower
@@ -62,4 +62,4 @@ triggers.WrenbowHelper/ScrambleRubiksCubeTrigger.placements.name.scramble_rubiks
 triggers.WrenbowHelper/ScrambleRubiksCubeTrigger.placements.description.scramble_rubiks_cube_trigger=Applies a configurable amount of random turns to a Rubiks Cube state
 triggers.WrenbowHelper/ScrambleRubiksCubeTrigger.attributes.description.cubeName=Cube state identifier to pair to
 triggers.WrenbowHelper/ScrambleRubiksCubeTrigger.attributes.description.scrambleLength=How many turns to apply
-triggers.WrenbowHelper/ScrambleRubiksCubeTrigger.attributes.description.doOnce=Delete this trigger after successfully applying a scramble (can fail if unpaired or the cube is locked)
+triggers.WrenbowHelper/ScrambleRubiksCubeTrigger.attributes.description.doOnce=Delete this trigger after applying a scramble
