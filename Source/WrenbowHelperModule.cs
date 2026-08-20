@@ -17,10 +17,11 @@ namespace Celeste.Mod.WrenbowHelper {
 
     public override void Load()
     {
-        Logger.SetLogLevel("WrenbowHelper", LogLevel.Info); //DEBUG LOGGING SETING DON"T KEEP THIS ENABLED
+        //Logger.SetLogLevel("WrenbowHelper", LogLevel.Debug); //DEBUG LOGGING SETING DON"T KEEP THIS ENABLED
         DreamBlockLiftSpeedFix.Load();
         SetLiftSpeedOverride.Load();
         ExtraDreamJump.Load();
+        FeatherController.Load();
     }
 
     public override void Unload()
@@ -28,6 +29,7 @@ namespace Celeste.Mod.WrenbowHelper {
         DreamBlockLiftSpeedFix.Unload();
         SetLiftSpeedOverride.Unload();
         ExtraDreamJump.Unload();
+        FeatherController.Unload();
     }
 
     // Logical OR between menu setting and map setting
