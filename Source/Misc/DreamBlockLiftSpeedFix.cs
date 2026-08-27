@@ -1,6 +1,6 @@
 using System;
-using Microsoft.Xna.Framework;
 using System.Runtime.CompilerServices;
+using Microsoft.Xna.Framework;
 
 namespace Celeste.Mod.WrenbowHelper {
 
@@ -13,6 +13,7 @@ namespace Celeste.Mod.WrenbowHelper {
         private class StoredLiftSpeed
         {
             public Vector2 Lift;
+            public int age;
         }
 
         // Stores the dream block's liftspeed between frames so the player can grab the correct value when updating (before the block)
@@ -24,11 +25,10 @@ namespace Celeste.Mod.WrenbowHelper {
             {
                 return;
             }
-            
-            On.Celeste.Player.DreamDashBegin += Player_DreamDashBegin;
             On.Celeste.Platform.Update += Platform_Update;
             On.Celeste.Solid.MoveHExact += Solid_MoveHExact;
             On.Celeste.Solid.MoveVExact += Solid_MoveVExact;
+            On.Celeste.Player.DreamDashCheck += Player_DreamDashCheck;
 
             hooked = true;
         }
@@ -39,12 +39,11 @@ namespace Celeste.Mod.WrenbowHelper {
             {
                 return;
             }
-
-            On.Celeste.Player.DreamDashBegin -= Player_DreamDashBegin;
             On.Celeste.Platform.Update -= Platform_Update;
             On.Celeste.Solid.MoveHExact -= Solid_MoveHExact;
             On.Celeste.Solid.MoveVExact -= Solid_MoveVExact;
-            
+            On.Celeste.Player.DreamDashCheck -= Player_DreamDashCheck;
+
 
             hooked = false;
         }
@@ -59,6 +58,7 @@ namespace Celeste.Mod.WrenbowHelper {
             if (solid is DreamBlock block) {
                 StoredLiftSpeed data = liftSpeedTable.GetOrCreateValue(block);
                 data.Lift.X = block.LiftSpeed.X;
+                data.age = 0;
             }
         }
 
@@ -74,6 +74,7 @@ namespace Celeste.Mod.WrenbowHelper {
             {
                 StoredLiftSpeed data = liftSpeedTable.GetOrCreateValue(block);
                 data.Lift.Y = block.LiftSpeed.Y;
+                data.age = 0;
             }
      }
 
@@ -90,84 +91,38 @@ namespace Celeste.Mod.WrenbowHelper {
             {
                 if (liftSpeedTable.TryGetValue(block, out StoredLiftSpeed data))
                 {
-                    data.Lift = Vector2.Zero;
+                    if (data.age <= 0)
+                    {
+                        data.age++;
+                    }
+                    else
+                    {
+                        data.Lift = Vector2.Zero;
+                    }
                 }
             }
         }
 
-        private static void Player_DreamDashBegin(On.Celeste.Player.orig_DreamDashBegin orig, Player player)
+        private static bool Player_DreamDashCheck(On.Celeste.Player.orig_DreamDashCheck orig, Player player, Vector2 dir)
         {
-            orig(player);
-
-            if (!WrenbowHelperModule.DreamBlockLiftSpeedFixEnabled)
+            bool result = orig(player, dir);
+            //Logger.Log(LogLevel.Error, "WrenbowHelper", $"DreamDashCheck called with result: {result}");
+            if (!WrenbowHelperModule.DreamBlockLiftSpeedFixEnabled || !result || player.dreamBlock == null)
             {
-                return;
+                return result;
             }
-
-            DreamBlock block = DetectDreamBlock(player);
-            if (block == null)
-            {
-                return;
-            }
-
-            if (liftSpeedTable.TryGetValue(block, out StoredLiftSpeed liftData))
+            //Logger.Log(LogLevel.Error, "WrenbowHelper", $"DreamDashCheck target found");
+            if (liftSpeedTable.TryGetValue(player.dreamBlock, out StoredLiftSpeed liftData))
             {
                 Vector2 lift = liftData.Lift;
-
+                //Logger.Log(LogLevel.Error, "WrenbowHelper", $"DreamDashCheck found lift: {lift}");
                 if (lift != Vector2.Zero)
                 {
                     player.LiftSpeed = lift;
                     player.liftSpeedTimer = AugmentedDuration;
                 }
             }
-        }
-        
-        private static DreamBlock DetectDreamBlock(Player player)
-        {
-            //Collision code taken from player.cs
-            Vector2 dir = player.DashDir;
-            Vector2 checkPos = player.Position + dir;
-
-            DreamBlock dreamBlock = player.CollideFirst<DreamBlock>(checkPos);
-            if (dreamBlock == null)
-            {
-                return null;
-            }
-            if (player.CollideCheck<Solid, DreamBlock>(checkPos))
-            {
-                Vector2 side = new Vector2(Math.Abs(dir.Y), Math.Abs(dir.X));
-
-                bool checkNegative = (dir.X != 0) ? player.Speed.Y <= 0 : player.Speed.X <= 0;
-                bool checkPositive = (dir.X != 0) ? player.Speed.Y >= 0 : player.Speed.X >= 0;
-
-                int correction = Player.DashCornerCorrection;
-
-                if (checkNegative) {
-                    for (int i = -1; i >= -correction; i--)
-                    {
-                        Vector2 at = checkPos + side * i;
-                        if (!player.CollideCheck<Solid, DreamBlock>(at))
-                        {
-                            return player.CollideFirst<DreamBlock>(at);
-                        }
-                    }
-                }
-
-                if (checkPositive) {
-                    for (int i = 1; i <= correction; i++)
-                    {
-                        Vector2 at = checkPos + side * i;
-                        if (!player.CollideCheck<Solid, DreamBlock>(at))
-                        {
-                            return player.CollideFirst<DreamBlock>(at);
-                        }
-                    }
-                }
-
-                return null;
-            }
-
-            return dreamBlock;
+            return result;
         }
     }
 }
