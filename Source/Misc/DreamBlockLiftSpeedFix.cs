@@ -91,7 +91,7 @@ namespace Celeste.Mod.WrenbowHelper {
             {
                 if (liftSpeedTable.TryGetValue(block, out StoredLiftSpeed data))
                 {
-                    if (data.age <= 0)
+                    if (data.age <= 0) // delay the liftspeed decay by a frame in order to hopefully prevent skipping frames when the speed is < 60
                     {
                         data.age++;
                     }
@@ -106,16 +106,13 @@ namespace Celeste.Mod.WrenbowHelper {
         private static bool Player_DreamDashCheck(On.Celeste.Player.orig_DreamDashCheck orig, Player player, Vector2 dir)
         {
             bool result = orig(player, dir);
-            //Logger.Log(LogLevel.Error, "WrenbowHelper", $"DreamDashCheck called with result: {result}");
             if (!WrenbowHelperModule.DreamBlockLiftSpeedFixEnabled || !result || player.dreamBlock == null)
             {
                 return result;
             }
-            //Logger.Log(LogLevel.Error, "WrenbowHelper", $"DreamDashCheck target found");
             if (liftSpeedTable.TryGetValue(player.dreamBlock, out StoredLiftSpeed liftData))
             {
                 Vector2 lift = liftData.Lift;
-                //Logger.Log(LogLevel.Error, "WrenbowHelper", $"DreamDashCheck found lift: {lift}");
                 if (lift != Vector2.Zero)
                 {
                     player.LiftSpeed = lift;
