@@ -17,7 +17,8 @@ local rubiksCube = {
             lockOnSolve = true,
             persistent = true,
             cubeName = "cube0",
-            colorPalette = "FFFFFF,FFFF00,0000FF,008000,FF0000,FFA500" 
+            colorPalette = "FFFFFF,FFFF00,0000FF,008000,FF0000,FFA500",
+            backgroundPalette = "000000,FFFFFF,808080,"
             }
         }
     },
@@ -43,6 +44,16 @@ local rubiksCube = {
             fieldType = "list",
             minimumElements = 6,
             maximumElements = 6,
+            elementDefault = "ffffff",
+            elementOptions = {
+                fieldType = "color",
+                allowXNAColors = false
+            }
+        },
+        backgroundPalette = {
+            fieldType = "list",
+            minimumElements = 3,
+            maximumElements = 3,
             elementDefault = "ffffff",
             elementOptions = {
                 fieldType = "color",

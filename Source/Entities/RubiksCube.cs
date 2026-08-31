@@ -21,6 +21,7 @@ public class RubiksCube : Entity {
     private readonly bool persistent;
     private readonly string cubeName;
     private readonly Color[] colorPalette;
+    private readonly Color[] backgroundPalette;
     internal readonly RubiksState state;
 
     private MTexture sticker;
@@ -33,6 +34,13 @@ public class RubiksCube : Entity {
         Color.Green,
         Color.Red,
         Color.Orange
+    };
+
+    private readonly Color[] BackgroundColors =
+    {
+        Color.Black,
+        Color.White,
+        Color.Gray
     };
 
     private readonly int stickerSpacing = 9;
@@ -66,6 +74,7 @@ public class RubiksCube : Entity {
             state = savedState;
             persistent = state.Persistent;
             colorPalette = state.ColorPalette;
+            backgroundPalette = state.BackgroundPalette;
         }
         else
         {
@@ -82,6 +91,14 @@ public class RubiksCube : Entity {
             }
             state.ColorPalette = colorPalette;
 
+            colorsAsStrings = data.Attr("backgroundPalette", "000000,FFFFFF,808080,").Split(',');
+            backgroundPalette = new Color[3];
+            for (int i = 0; i < 3; i++)
+            {
+                backgroundPalette[i] = Calc.HexToColor(colorsAsStrings[i]);
+            }
+            state.BackgroundPalette = backgroundPalette;
+
             if (!string.IsNullOrEmpty(cubeName))
             {
                 WrenbowHelperModule.Session.RubiksCubes[cubeName] = state;
@@ -89,6 +106,7 @@ public class RubiksCube : Entity {
         }
 
         StickerColors = state.ColorPalette;
+        BackgroundColors = state.BackgroundPalette;
 
         faceSpacing = (stickerSpacing * state.Size) + faceGap;
         facePositions = GetFacePositions();
@@ -163,7 +181,7 @@ public class RubiksCube : Entity {
 
     private void DrawFace(RubiksLogic.AbsoluteFaces face, Vector2 origin)
     {
-        Draw.Rect(origin.X, origin.Y, state.Size * stickerSpacing + 1, state.Size * stickerSpacing + 1, Color.Black);
+        Draw.Rect(origin.X, origin.Y, state.Size * stickerSpacing + 1, state.Size * stickerSpacing + 1, BackgroundColors[0]);
         for (int i = 0; i < state.Size; i++)
         {
             for (int j = 0; j < state.Size; j++)
@@ -173,7 +191,7 @@ public class RubiksCube : Entity {
                     RubiksLogic.HighlightLevel highlight = state.Highlights[(int)face, i, j];
                     if (highlight != RubiksLogic.HighlightLevel.None)
                     {
-                        Draw.Rect(origin + (new Vector2(j, i) * stickerSpacing), stickerSpacing+1, stickerSpacing+1, (highlight == RubiksLogic.HighlightLevel.Primary ? Color.White : Color.Gray));
+                        Draw.Rect(origin + (new Vector2(j, i) * stickerSpacing), stickerSpacing+1, stickerSpacing+1, (highlight == RubiksLogic.HighlightLevel.Primary ? BackgroundColors[1] : BackgroundColors[2]));
                     }
                 }
                 RubiksLogic.CubeColors color = state.Cube[(int)face, i, j];

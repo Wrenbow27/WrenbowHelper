@@ -54,6 +54,7 @@ public class RubiksState
     public bool? FlagUpdatePending { get; internal set; } //"flags" a flag change, since it can't be done here without a level or scene reference
     public bool LockOnSolve { get; internal set; }
     public Microsoft.Xna.Framework.Color[] ColorPalette { get; internal set; }
+    public Microsoft.Xna.Framework.Color[] BackgroundPalette { get; internal set; }
 
     public RubiksState(int size)
     {
