@@ -71,7 +71,9 @@ local rubiksCube = {
         "solvedFlag",
         "lockOnSolve",
         "cubeName",
-        "persistent"      
+        "persistent",
+        "colorPalette",
+        "backgroundPalette"  
     },
 }
 

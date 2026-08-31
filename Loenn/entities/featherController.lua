@@ -27,6 +27,22 @@ local featherController = {
             useAlpha = false
         },
     },
+    fieldOrder = {
+        "x",
+        "y",
+        "flyTime",
+        "highFlySpeed",
+        "turnFlySpeed",
+        "lowFlySpeed",
+        "turnRateMultiplier",
+        "trailColor",
+        "featherHyper",
+        "trueFeatherSuper",
+        "trueFeatherWallBounce",
+        "noStartSlowdown",
+        "noFeatherBoost",
+        "octalAnalog"
+    },
     texture = "objects/WrenbowHelper/FeatherController/FeatherController"
 }
 

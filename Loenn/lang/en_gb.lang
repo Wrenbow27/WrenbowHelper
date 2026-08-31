@@ -44,6 +44,7 @@ entities.WrenbowHelper/RubiksCube.attributes.description.lockOnSolve=Prevents th
 entities.WrenbowHelper/RubiksCube.attributes.description.cubeName=Identifier to store the puzzle state to/reflect from
 entities.WrenbowHelper/RubiksCube.attributes.description.persistent=Whether to keep the cube state saved when leaving the screen
 entities.WrenbowHelper/RubiksCube.attributes.description.colorPalette=Set of 6 colors to shift the sticker texture by\nA colorblind option is always available to the player as a mod setting to give each sticker set a unique icon
+entities.WrenbowHelper/RubiksCube.attributes.description.backgroundPalette=Set of 3 colors to control the default background, primary highlight, and secondary highlight colors
 
 # Rubiks Watchtower
 entities.WrenbowHelper/RubiksWatchtower.placements.name.rubiks_watchtower=Rubiks Watchtower
@@ -63,3 +64,15 @@ triggers.WrenbowHelper/ScrambleRubiksCubeTrigger.placements.description.scramble
 triggers.WrenbowHelper/ScrambleRubiksCubeTrigger.attributes.description.cubeName=Cube state identifier to pair to
 triggers.WrenbowHelper/ScrambleRubiksCubeTrigger.attributes.description.scrambleLength=How many turns to apply
 triggers.WrenbowHelper/ScrambleRubiksCubeTrigger.attributes.description.doOnce=Delete this trigger after applying a scramble
+
+# Feather Controller
+entities.WrenbowHelper/FeatherController.placements.name.feather_controller=Feather Controller
+entities.WrenbowHelper/FeatherController.attributes.description.highFlySpeed= The speed that the player will approach when traveling in the input direction
+entities.WrenbowHelper/FeatherController.attributes.description.turnFlySpeed= The speed that the player will have while sharply turning
+entities.WrenbowHelper/FeatherController.attributes.description.lowFlySpeed= The speed that the player will have when not holding any inputs
+entities.WrenbowHelper/FeatherController.attributes.description.octalAnalog= Snaps analog angles to their closest octal direction
+entities.WrenbowHelper/FeatherController.attributes.description.featherHyper= Allows for hypers to be performed out of feather state
+entities.WrenbowHelper/FeatherController.attributes.description.trueFeatherSuper= Allows for supers to be performed out of feather state
+entities.WrenbowHelper/FeatherController.attributes.description.trueFeatherWallBounce= Allows for wallbounces to be performed out of feather state
+entities.WrenbowHelper/FeatherController.attributes.description.noStartSlowdown= Removes the initial slowdown period when entering feather state
+entities.WrenbowHelper/FeatherController.attributes.description.noFeatherBoost= Removes the initial boost given when you finish transforming in feather state
