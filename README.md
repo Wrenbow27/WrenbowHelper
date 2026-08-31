@@ -9,9 +9,9 @@ Fixes the oversight of dream blocks not giving liftspeed when the player moves b
 This occurs most notably with moving reverse dream blocks
 
 Dream jump refill:
-Allows for a second non-buffered dream jump i.e. dtjs
+Allows for a second non-buffered dream jump i.e. dtj
 This works by refunding the coyote time of a jump/hyper/super if it was done using the dream block's coyote time
-While a dream jump is "stored" like this, the flag WrenbowHelper_HasDreamJump is held as true
+While a dream jump is "stored" like this, the flag WrenbowHelper_HasDreamJump is held as true to help enable custom behaviors
 
 Bluetooth refill:
 Requested by jantheguy
@@ -27,10 +27,12 @@ Or not, I'm not the boss of you
 A colorblind mode is provided under Mod Settings
 Yes, I know that nobody asked for this. ANd yes, I do think it's funny
 
+Feather Controller:
+Requested by Ivory and Bartholomew
+Adds various settings to adjust feather state, including speeds, color, and much more
+
 -Credits-
 
 Chronia Helper - moreOptions lua code
-
 Extended Variants Mode - adapted Jump Refill textures
-
 Communal Helper - adapted Dream Refill textures
