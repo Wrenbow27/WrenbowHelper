@@ -13,7 +13,8 @@ namespace Celeste.Mod.WrenbowHelper {
         private class StoredLiftSpeed
         {
             public Vector2 Lift;
-            public int age;
+            public int X_age;
+            public int Y_age;
         }
 
         // Stores the dream block's liftspeed between frames so the player can grab the correct value when updating (before the block)
@@ -58,7 +59,7 @@ namespace Celeste.Mod.WrenbowHelper {
             if (solid is DreamBlock block) {
                 StoredLiftSpeed data = liftSpeedTable.GetOrCreateValue(block);
                 data.Lift.X = block.LiftSpeed.X;
-                data.age = 0;
+                data.X_age = 0;
             }
         }
 
@@ -74,7 +75,7 @@ namespace Celeste.Mod.WrenbowHelper {
             {
                 StoredLiftSpeed data = liftSpeedTable.GetOrCreateValue(block);
                 data.Lift.Y = block.LiftSpeed.Y;
-                data.age = 0;
+                data.Y_age = 0;
             }
      }
 
@@ -91,15 +92,24 @@ namespace Celeste.Mod.WrenbowHelper {
             {
                 if (liftSpeedTable.TryGetValue(block, out StoredLiftSpeed data))
                 {
-                    if (data.age <= 0) // delay the liftspeed decay by a frame in order to hopefully prevent skipping frames when the speed is < 60
+                    if (data.X_age <= 0) // delay the liftspeed decay by two frames in order to hopefully prevent skipping frames when the speed is < 60
                     {
-                        data.age++;
+                        data.X_age++;
                     }
                     else
                     {
-                        data.Lift = Vector2.Zero;
+                        data.Lift.X = 0f;
                     }
-                }
+
+                    if (data.Y_age <= 0) // also split the decay by axes
+                    {
+                        data.Y_age++;
+                    }
+                    else
+                    {
+                        data.Lift.Y = 0f;
+                    }
+                }                
             }
         }
 
