@@ -29,7 +29,11 @@ namespace Celeste.Mod.WrenbowHelper
         private readonly bool noStartSlowdown;
         private readonly bool noFeatherBoost;
         private readonly Color trailColor;
+        private readonly bool allowPickup;
+        private readonly bool allowThrowing;
 
+        private static bool pseudoStStarFlyPickup = false;
+        private static Coroutine pseudoStStarFlyPickupCoroutine;
         private static ILHook starFlyCoroutineHooks;
 
         public FeatherController(EntityData data, Vector2 offset)
@@ -47,6 +51,8 @@ namespace Celeste.Mod.WrenbowHelper
             noStartSlowdown = data.Bool("noStartSlowdown", false);
             noFeatherBoost = data.Bool("noFeatherBoost", false);
             trailColor = data.HexColor("trailColor", Calc.HexToColor("ffd65c"));
+            allowPickup = data.Bool("allowPickup", false);
+            allowThrowing = data.Bool("allowThrowing", false);
         }
 
         public static void Load()
@@ -54,6 +60,7 @@ namespace Celeste.Mod.WrenbowHelper
             On.Celeste.Player.StartStarFly += Player_StartStarFly;
             On.Celeste.Player.StarFlyBegin += Player_StarFlyBegin;
             On.Celeste.Player.StarFlyUpdate += Player_StarFlyUpdate;
+            On.Celeste.Player.StarFlyEnd += Player_StarFlyEnd;
 
             starFlyCoroutineHooks = new ILHook(typeof(Player)
                                             .GetMethod("StarFlyCoroutine",
@@ -68,6 +75,7 @@ namespace Celeste.Mod.WrenbowHelper
             On.Celeste.Player.StartStarFly -= Player_StartStarFly;
             On.Celeste.Player.StarFlyBegin -= Player_StarFlyBegin;
             On.Celeste.Player.StarFlyUpdate -= Player_StarFlyUpdate;
+            On.Celeste.Player.StarFlyEnd -= Player_StarFlyEnd;
 
             starFlyCoroutineHooks?.Dispose();
             starFlyCoroutineHooks = null;
@@ -113,6 +121,32 @@ namespace Celeste.Mod.WrenbowHelper
             }
             else
             {
+                if (pseudoStStarFlyPickup)
+                {
+                    return Player.StStarFly;
+                }
+                if (controller.allowPickup && player.Holding == null && Input.GrabCheck && !player.Ducking)
+                {
+                    foreach (Holdable component in Engine.Scene.Tracker.GetComponents<Holdable>())
+                    {
+                        if (component.Check(player) && Pickup(player, component)) // okay, new pickup logic instead
+                        {
+                            pseudoStStarFlyPickup = true;
+                            pseudoStStarFlyPickupCoroutine = new Coroutine(
+                                PseudoStStarFlyPickupCoroutine(player)
+                            );
+                            player.Add(pseudoStStarFlyPickupCoroutine);
+                            return Player.StStarFly;
+                        }
+                    }
+                }
+                if (controller.allowThrowing && player.Holding != null && !Input.GrabCheck && player.minHoldTimer <= 0f)
+                {
+                    player.Throw();
+                    player.Sprite.Play("starFly"); //player.Throw changes sprite, reset it immediately
+                    
+                }
+
                 Vector2 aim = OctalSnapping(Input.Feather.Value); //controller condition checked inside
                 bool slow = false;
                 if (aim == Vector2.Zero)
@@ -261,9 +295,88 @@ namespace Celeste.Mod.WrenbowHelper
             return Player.StStarFly;
         }
 
+        private static void Player_StarFlyEnd(On.Celeste.Player.orig_StarFlyEnd orig, Player player)
+        {
+            pseudoStStarFlyPickup = false;
+            Coroutine coroutine = pseudoStStarFlyPickupCoroutine;
+            coroutine?.Cancel();
+            coroutine?.RemoveSelf();
+            orig(player);
+        }
+
         private static FeatherController GetController()
         {
             return Engine.Scene?.Tracker.GetEntity<FeatherController>();
+        }
+
+        private static bool Pickup(Player player, Holdable holdable)
+        {
+            if (!player.Dead && holdable.Pickup(player))
+            {
+                player.Ducking = false;
+                player.Holding = holdable;
+                player.minHoldTimer = 0.35f;
+                return true;
+            }
+            return false;
+        }
+
+        internal static IEnumerator PseudoStStarFlyPickupCoroutine(Player player)
+        {
+            player.Play("event:/char/madeline/crystaltheo_lift");
+            Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
+            if (
+                player.Holding != null &&
+                player.Holding.SlowFall &&
+                ((player.gliderBoostTimer - 0.16f > 0f &&
+                  player.gliderBoostDir.Y < 0f) ||
+                  (player.Speed.Length() > 180f &&
+                  player.Speed.Y <= 0f)))
+            {
+                Audio.Play("event:/new_content/game/10_farewell/glider_platform_dissipate", player.Position);
+            }
+            Vector2 oldSpeed = player.Speed;
+            float varJump = player.varJumpTimer; // I'm leaving this in but it's on thin ice
+            player.Speed = Vector2.Zero;
+            Vector2 val = player.Holding.Entity.Position - player.Position;
+            Vector2 carryOffsetTarget = Player.CarryOffsetTarget;
+            /* seems to be malformed
+            Vector2 control = default(Vector2);
+            ((Vector2)(ref control))..ctor(val.X + (float)(Math.Sign(val.X) * 2), Player.CarryOffsetTarget.Y - 2f);
+            */
+            Vector2 control = new(val.X + Math.Sign(val.X) * 2f, Player.CarryOffsetTarget.Y - 2f);
+
+            SimpleCurve curve = new SimpleCurve(val, carryOffsetTarget, control);
+            player.carryOffset = val;
+            Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeInOut, 0.16f, start: true);
+            tween.OnUpdate = delegate(Tween t)
+            {
+                player.carryOffset = curve.GetPoint(t.Eased);
+            };
+            player.Add(tween);
+            yield return tween.Wait();
+            player.Speed = oldSpeed;
+            //player.Speed.Y = Math.Min(player.Speed.Y, 0f); removed because it felt weird
+            player.varJumpTimer = varJump;
+            //player.StateMachine.State = 19; removed because pseudoState
+            pseudoStStarFlyPickup = false; // added the pseudoState exit condition instead
+            if (player.Holding != null && player.Holding.SlowFall)
+            {
+                if (player.gliderBoostTimer > 0f && player.gliderBoostDir.Y < 0f)
+                {
+                    Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
+                    player.gliderBoostTimer = 0f;
+                    player.Speed.Y = Math.Min(player.Speed.Y, -240f * Math.Abs(player.gliderBoostDir.Y));
+                }
+                else if (player.Speed.Y < 0f)
+                {
+                    player.Speed.Y = Math.Min(player.Speed.Y, -105f);
+                }
+                if (player.onGround && (float)Input.MoveY == 1f)
+                {
+                    player.holdCannotDuck = true;
+                }
+            }
         }
 
         private static bool injectNoStartSlowdown(bool value)

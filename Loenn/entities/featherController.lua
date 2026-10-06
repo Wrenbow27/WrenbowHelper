@@ -16,7 +16,9 @@ local featherController = {
             trueFeatherWallBounce = false,
             noStartSlowdown = false,
             noFeatherBoost = false,
-            trailColor = "ffd65c"
+            trailColor = "ffd65c",
+            allowPickup = false,
+            allowThrowing = false
             }
         }
     },
@@ -41,7 +43,9 @@ local featherController = {
         "trueFeatherWallBounce",
         "noStartSlowdown",
         "noFeatherBoost",
-        "octalAnalog"
+        "octalAnalog",
+        "allowPickup",
+        "allowThrowing"
     },
     texture = "objects/WrenbowHelper/FeatherController/FeatherController"
 }
