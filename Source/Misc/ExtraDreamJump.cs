@@ -45,8 +45,7 @@ namespace Celeste.Mod.WrenbowHelper {
 
         public static bool GiveDreamJump(
             Player player,
-            int earlyLeniencyFrames,
-            int lateLeniencyFrames,
+            int leniencyFrames,
             bool persistent,
             bool trailIndicator,
             Color trailColor)
@@ -54,8 +53,7 @@ namespace Celeste.Mod.WrenbowHelper {
             if (!WrenbowHelperModule.Session.HasDreamJump) 
             {
                 WrenbowHelperModule.Session.HasDreamJump = true;
-                WrenbowHelperModule.Session.EarlyLeniencyFrames = earlyLeniencyFrames;
-                WrenbowHelperModule.Session.LateLeniencyFrames = lateLeniencyFrames;
+                WrenbowHelperModule.Session.LeniencyFrames = leniencyFrames;
                 WrenbowHelperModule.Session.Persistent = persistent;
                 WrenbowHelperModule.Session.TrailIndicator = trailIndicator;
                 WrenbowHelperModule.Session.TrailColor = trailColor;
@@ -108,7 +106,7 @@ namespace Celeste.Mod.WrenbowHelper {
             orig(player);
             if (WrenbowHelperModule.Session.HasDreamJump)
             {
-                player.jumpGraceTimer += WrenbowHelperModule.Session.EarlyLeniencyFrames * Engine.DeltaTime;
+                player.jumpGraceTimer += WrenbowHelperModule.Session.LeniencyFrames * Engine.DeltaTime;
                 WrenbowHelperModule.Session.DreamBlockGraceTime = player.jumpGraceTimer;
                 WrenbowHelperModule.Session.CanDreamJump = true;
                 if (!WrenbowHelperModule.Session.Persistent)
@@ -141,7 +139,7 @@ namespace Celeste.Mod.WrenbowHelper {
         {
             if (WrenbowHelperModule.Session.CanDreamJump && WrenbowHelperModule.Session.DreamBlockGraceTime > 0f)
             {
-                player.jumpGraceTimer = WrenbowHelperModule.Session.DreamBlockGraceTime + WrenbowHelperModule.Session.LateLeniencyFrames * Engine.DeltaTime;
+                player.jumpGraceTimer = WrenbowHelperModule.Session.DreamBlockGraceTime;
                 WrenbowHelperModule.Session.DreamBlockGraceTime = 0f;
                 WrenbowHelperModule.Session.HasDreamJump = false;
                 WrenbowHelperModule.Session.CanDreamJump = false;

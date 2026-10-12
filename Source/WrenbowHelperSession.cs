@@ -11,8 +11,7 @@ namespace Celeste.Mod.WrenbowHelper
         public bool HasDreamJump = false;
         public bool CanDreamJump = false;
         public float DreamBlockGraceTime = 0f;
-        public int EarlyLeniencyFrames = 0;
-        public int LateLeniencyFrames = 0;
+        public int LeniencyFrames = 0;
         public bool Persistent = false;
         public bool TrailIndicator = false;
         public Color TrailColor = Calc.HexToColor("c81ec8");

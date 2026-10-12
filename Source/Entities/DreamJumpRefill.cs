@@ -12,8 +12,7 @@ namespace Celeste.Mod.WrenbowHelper.Entities;
 public class DreamJumpRefill : Entity {
     //lonn declared
     private readonly bool oneUse;
-    private readonly int earlyLeniencyFrames;
-    private readonly int lateLeniencyFrames;
+    private readonly int leniencyFrames;
     private readonly bool persistent;
     private readonly bool trailIndicator;
     private readonly Color trailColor;
@@ -51,8 +50,10 @@ public class DreamJumpRefill : Entity {
         : base(data.Position + offset)
     {
         oneUse = data.Bool("oneUse", false);
-        earlyLeniencyFrames = data.Int("earlyLeniencyFrames", 0);
-        lateLeniencyFrames = data.Int("lateLeniencyFrames", 0);
+        leniencyFrames = data.Int("earlyLeniencyFrames", 0);
+        if (leniencyFrames == 0){ // added for backwards compatibility with the old version
+            leniencyFrames = data.Int("earlyLeniencyFrames", 0) + data.Int("lateLeniencyFrames", 0);
+        }
         persistent = data.Bool("persistent", true);
         trailIndicator = data.Bool("trailIndicator", true);
         trailColor = data.HexColor("trailColor", Calc.HexToColor("c81ec8"));
@@ -163,8 +164,7 @@ public class DreamJumpRefill : Entity {
     {
         if (ExtraDreamJump.GiveDreamJump(
             player,
-            earlyLeniencyFrames,
-            lateLeniencyFrames,
+            leniencyFrames,
             persistent,
             trailIndicator,
             trailColor)) // <= return whether collected after check
