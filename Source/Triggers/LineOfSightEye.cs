@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Celeste.Mod.Entities;
 using Celeste.Mod.WrenbowHelper.Entities;
 using Microsoft.Xna.Framework;
@@ -9,14 +10,14 @@ namespace Celeste.Mod.WrenbowHelper.Triggers;
 
 [CustomEntity("WrenbowHelper/LineOfSightEye")]
 [Tracked]
-public class LineOfSightEye : Entity 
+public class LineOfSightEye : Entity
 {
     //Lonn Initialized
-    private readonly string entityID1;
-    private readonly string entityID2;
+    private readonly string entityFromID;
+    private readonly string[] entityToIDs;
     private readonly string flag;
     private readonly string flagIf;
-    private readonly float maxRange;
+    private readonly float maxRangeSq;
     private readonly bool solids;
     private readonly bool lightBlockers;
     private readonly bool drawSprite;
@@ -25,12 +26,12 @@ public class LineOfSightEye : Entity
     private bool active = false;
     private readonly bool hasFlag = false;
     private static Dictionary<int, Entity> queryEntities = new();
-    private int?[] keys = [null, null];
+    private int keyFrom;
+    private int[] keysTo;
     private Entity entityFrom;
-    private Entity entityTo;
+    private Entity[] entitiesTo;
     private bool cheapCheck = true;
 
-    
     private MTexture eyeTexture;
 	private MTexture pupilTexture;
 	private Sprite eyelid;
@@ -42,11 +43,12 @@ public class LineOfSightEye : Entity
     public LineOfSightEye(EntityData data, Vector2 offset)
         : base(data.Position + offset)
     {
-        entityID1 = data.String("entityFrom");
-        entityID2 = data.String("entityTo");
+        entityFromID = data.String("entityFrom");
+        entityToIDs = data.Attr("entityTo", "player").Split(',');
         flag = data.String("flag");
         flagIf = data.String("flagIf");
-        maxRange = data.Float("maxRange");
+        maxRangeSq = data.Float("maxRange");
+        maxRangeSq *= maxRangeSq;
         solids = data.Bool("solids");
         lightBlockers = data.Bool("lightBlockers");
         drawSprite = data.Bool("drawSprite", true);
@@ -60,7 +62,7 @@ public class LineOfSightEye : Entity
     public override void Added(Scene scene)
 	{
         base.Added(scene);
-        
+
         if (!drawSprite)
         {
             return;
@@ -99,14 +101,15 @@ public class LineOfSightEye : Entity
             List<int> ids = [];
             foreach (LineOfSightEye eye in scene.Tracker.GetEntities<LineOfSightEye>())
             {
-                int? key1 = ParseID(eye.entityID1);
-                int? key2 = ParseID(eye.entityID2);
+                int? tryKeyFrom = ParseID(eye.entityFromID);
+                int?[] tryKeysTo = ParseIDs(eye.entityToIDs);
 
-                if (key1 is not null && key2 is not null)
+                if (tryKeyFrom is not null && !tryKeysTo.Contains(null))
                 {
-                    eye.keys = [key1, key2];
-                    ids.Add((int)key1);
-                    ids.Add((int)key2);
+                    eye.keyFrom = (int)tryKeyFrom;
+                    eye.keysTo = tryKeysTo.Where(x => x.HasValue).Select(x => x.Value).ToArray();
+                    ids.Add(eye.keyFrom);
+                    ids.AddRange(eye.keysTo);
                     eye.active = true;
                 }
                 else
@@ -130,53 +133,13 @@ public class LineOfSightEye : Entity
 
         if (active) // run by every entity with valid ids set
         {
-            int key1 = (int)keys[0];
-            switch (key1)
-            {
-                case (-2):
-                    entityFrom = this;
-                    break;
-                case (-1):
-                    entityFrom = scene.Tracker.GetEntity<Player>();
-                    break;
-                default:
-                    if (queryEntities.ContainsKey(key1)){
-                        entityFrom = queryEntities[key1];
-                        if (entityFrom is Solid)
-                        {
-                            cheapCheck = false;
-                        }
-                    }
-                    else
-                    {
-                        active = false;
-                    }
-                    break;
-            }
+            entityFrom = QueryEntity(scene, keyFrom);
 
-            int key2 = (int)keys[1];
-            switch (key2)
+            entitiesTo = new Entity[keysTo.Length];
+
+            for (int i = 0; i < keysTo.Length; i++)
             {
-                case (-2):
-                    entityTo = this;
-                    break;
-                case (-1):
-                    entityTo = scene.Tracker.GetEntity<Player>();
-                    break;
-                default:
-                    if (queryEntities.ContainsKey(key2))
-                    {
-                        entityTo = queryEntities[key2];
-                        if (entityTo is Solid)
-                        {
-                            cheapCheck = false;
-                        }
-                    }
-                    else
-                    {
-                        active = false;
-                    }
-                    break;
+                entitiesTo[i] = QueryEntity(scene, keysTo[i]);
             }
         }
     }
@@ -198,6 +161,46 @@ public class LineOfSightEye : Entity
         return null;
     }
 
+    private int?[] ParseIDs(string[] ids)
+    {
+        int?[] parsedIDs = new int?[ids.Length];
+        int i = 0;
+        foreach (string id in ids)
+        {
+            parsedIDs[i] = ParseID(id);
+            i++;
+        }
+        return parsedIDs;
+    }
+
+    private Entity QueryEntity(Scene scene, int id)
+    {
+        Entity entity = null;
+        switch (id)
+        {
+            case (-2):
+                entity = this;
+                break;
+            case (-1):
+                entity = scene.Tracker.GetEntity<Player>();
+                break;
+            default:
+                if (queryEntities.ContainsKey(id)){
+                    entity = queryEntities[id];
+                    if (entity is Solid)
+                    {
+                        cheapCheck = false;
+                    }
+                }
+                else
+                {
+                    active = false;
+                }
+                break;
+        }
+        return entity;
+    }
+
     public override void Update()
     {
         base.Update();
@@ -207,36 +210,52 @@ public class LineOfSightEye : Entity
             if (!(hasFlag && !SceneAs<Level>().Session.GetFlag(flagIf)))
             { // not being disabled via flag
                 Vector2 pos1 = entityFrom.Center;
-                Vector2 pos2 = entityTo.Center;
-                if ((pos1 - pos2).Length() <= maxRange)
-                { // entity in range
-                    bool canSee = true;
-                    if (solids && CollideCheckSolids(pos1, pos2))
-                    {
-                        canSee = false;
+                float? minDistSq = null;
+                Entity closest = null;
+                bool anyInRange = false;
+                foreach (Entity entityTo in entitiesTo)
+                {
+                    Vector2 pos2 = entityTo.Center;
+                    float distanceSq = (pos1 - pos2).LengthSquared();
+                    if ( distanceSq <= maxRangeSq)
+                    { // entity in range
+                        anyInRange = true;
+                        if (solids && CollideCheckSolids(pos1, pos2))
+                        {
+                            continue;
+                        }
+                        if (lightBlockers && CollideCheckOccluders(pos1, pos2))
+                        {
+                            continue;
+                        }
+                        
+                        // line of sight found
+                        if (minDistSq is null || (float)minDistSq > distanceSq)
+                        {
+                            minDistSq = distanceSq;
+                            closest = entityTo;
+                        }
                     }
-                    if (canSee && lightBlockers && CollideCheckOccluders(pos1, pos2))
-                    {
-                        canSee = false;
-                    }
+                }
 
-                    SceneAs<Level>().Session.SetFlag(flag, canSee);
-
+                if (closest is not null) // has any non null or non zero values
+                {
+                    SceneAs<Level>().Session.SetFlag(flag, true);
+                    MovePupil(closest.Center - entityFrom.Center);
                     OpenEye();
-                    if (canSee)
+                }
+                else
+                {
+                    SceneAs<Level>().Session.SetFlag(flag, false);
+                    MovePupil(Vector2.Zero);
+                    if (anyInRange)
                     {
-                        MovePupil(entityTo.Center - entityFrom.Center);
+                        OpenEye();
                     }
                     else
                     {
-                        MovePupil(Vector2.Zero);
+                        CloseEye();
                     }
-                }
-                else
-                { // entity not in range
-                    SceneAs<Level>().Session.SetFlag(flag, false);
-                    MovePupil(Vector2.Zero);
-                    CloseEye();
                 }
             }
             else
@@ -256,7 +275,7 @@ public class LineOfSightEye : Entity
         } else {
             foreach (Solid solid in Scene.CollideAll<Solid>(from, to))
             {
-                if (solid != entityFrom && solid != entityTo)
+                if (solid != entityFrom && !entitiesTo.Contains(solid))
                 {
                     return true;
                 }
@@ -273,7 +292,7 @@ public class LineOfSightEye : Entity
                 occluder.Entity is null ||
                 !occluder.Entity.Visible ||
                 occluder.Entity == entityFrom ||
-                occluder.Entity == entityTo ||
+                entitiesTo.Contains(occluder.Entity) ||
                 occluder.Alpha < 0.5f)
             {
                 continue;

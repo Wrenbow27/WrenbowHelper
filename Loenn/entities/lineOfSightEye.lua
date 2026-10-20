@@ -18,6 +18,14 @@ local lineOfSightEye = {
         },
     },
     fieldInformation = {
+        entityTo = {
+            fieldType = "list",
+            minimumElements = 0,
+            elementDefault = "",
+            elementOptions = {
+                fieldType = "string"
+            }
+        }
     },
 }
 
