@@ -18,7 +18,7 @@ local rubiksCube = {
             persistent = true,
             cubeName = "cube0",
             colorPalette = "FFFFFF,FFFF00,0000FF,008000,FF0000,FFA500",
-            backgroundPalette = "000000,FFFFFF,808080,"
+            backgroundPalette = "000000,FFFFFF,808080"
             }
         }
     },
