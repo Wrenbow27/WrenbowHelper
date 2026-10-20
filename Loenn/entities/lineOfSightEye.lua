@@ -12,7 +12,7 @@ local lineOfSightEye = {
                 flagIf = "",
                 maxRange = 60,
                 solids = true,
-                lightBlockers = false,
+                lightBlockers = true,
                 drawSprite = true,
             }
         },
@@ -26,6 +26,18 @@ local lineOfSightEye = {
                 fieldType = "string"
             }
         }
+    },
+    fieldOrder = {
+        "x",
+        "y",
+        "entityFrom",
+        "entityTo",
+        "flag",
+        "flagIf",
+        "maxRange",
+        "solids",
+        "lightBlockers",
+        "drawSprite" 
     },
 }
 

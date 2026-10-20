@@ -67,12 +67,26 @@ triggers.WrenbowHelper/ScrambleRubiksCubeTrigger.attributes.description.doOnce=D
 
 # Feather Controller
 entities.WrenbowHelper/FeatherController.placements.name.feather_controller=Feather Controller
-entities.WrenbowHelper/FeatherController.attributes.description.highFlySpeed= The speed that the player will approach when traveling in the input direction
-entities.WrenbowHelper/FeatherController.attributes.description.turnFlySpeed= The speed that the player will have while sharply turning
-entities.WrenbowHelper/FeatherController.attributes.description.lowFlySpeed= The speed that the player will have when not holding any inputs
-entities.WrenbowHelper/FeatherController.attributes.description.octalAnalog= Snaps analog angles to their closest octal direction
-entities.WrenbowHelper/FeatherController.attributes.description.featherHyper= Allows for hypers to be performed out of feather state
-entities.WrenbowHelper/FeatherController.attributes.description.trueFeatherSuper= Allows for supers to be performed out of feather state
-entities.WrenbowHelper/FeatherController.attributes.description.trueFeatherWallBounce= Allows for wallbounces to be performed out of feather state
-entities.WrenbowHelper/FeatherController.attributes.description.noStartSlowdown= Removes the initial slowdown period when entering feather state
-entities.WrenbowHelper/FeatherController.attributes.description.noFeatherBoost= Removes the initial boost given when you finish transforming in feather state
+entities.WrenbowHelper/FeatherController.attributes.description.highFlySpeed=The speed that the player will approach when traveling in the input direction
+entities.WrenbowHelper/FeatherController.attributes.description.turnFlySpeed=The speed that the player will have while sharply turning
+entities.WrenbowHelper/FeatherController.attributes.description.lowFlySpeed=The speed that the player will have when not holding any inputs
+entities.WrenbowHelper/FeatherController.attributes.description.octalAnalog=Snaps analog angles to their closest octal direction
+entities.WrenbowHelper/FeatherController.attributes.description.featherHyper=Allows for hypers to be performed out of feather state
+entities.WrenbowHelper/FeatherController.attributes.description.trueFeatherSuper=Allows for supers to be performed out of feather state
+entities.WrenbowHelper/FeatherController.attributes.description.trueFeatherWallBounce=Allows for wallbounces to be performed out of feather state
+entities.WrenbowHelper/FeatherController.attributes.description.noStartSlowdown=Removes the initial slowdown period when entering feather state
+entities.WrenbowHelper/FeatherController.attributes.description.noFeatherBoost=Removes the initial boost given when you finish transforming in feather state
+entities.WrenbowHelper/FeatherController.attributes.description.allowPickup=Lets you pick up holdables while in feather state
+entities.WrenbowHelper/FeatherController.attributes.description.allowThrowing=Lets you throw holdables while in feather state\nDoes not necessarily require allowPickup
+
+# Line Of SIght Eye
+entities.WrenbowHelper/LineOfSightEye.placements.name.line_of_sight_eye=Line Of Sight Eye
+entities.WrenbowHelper/LineOfSightEye.placements.description.line_of_sight_eye=Activates a flag based on whether it has a line of sight to an entity\nCan also allow another entity to be the point of vision, and can look for a list of entities
+entities.WrenbowHelper/LineOfSightEye.attributes.description.entityFrom=Entity used as the start point for line of sight\nSupports "self", "player", or an arbitrary entity's ID number
+entities.WrenbowHelper/LineOfSightEye.attributes.description.entityTo=Entity(ies) used as the end point for line of sight\nSupports "self", "player", or an arbitrary entity's ID number
+entities.WrenbowHelper/LineOfSightEye.attributes.description.flag=Flag to set while line of sight is detected
+entities.WrenbowHelper/LineOfSightEye.attributes.description.flagIf=If a flag is given, it must be true to check line of sight
+entities.WrenbowHelper/LineOfSightEye.attributes.description.maxRange=Detection range in pixels
+entities.WrenbowHelper/LineOfSightEye.attributes.description.solids=If true, allows for line of sight to be blocked by solids\nThis includes both solidtiles and solid entities\nNote that the solidtile collision check can have weird edge cases
+entities.WrenbowHelper/LineOfSightEye.attributes.description.lightBlockers=If true, allows for line of sight to be blocked by entities with a LightOcclude component\nIntended to allow entities such as doors and trapdoors to block vision
+entities.WrenbowHelper/LineOfSightEye.attributes.description.drawSprite=Whether to show the eye sprite ingame\nRecommended to disable if not checking vision from self

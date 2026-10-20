@@ -43,14 +43,14 @@ public class LineOfSightEye : Entity
     public LineOfSightEye(EntityData data, Vector2 offset)
         : base(data.Position + offset)
     {
-        entityFromID = data.String("entityFrom");
+        entityFromID = data.String("entityFrom", "self");
         entityToIDs = data.Attr("entityTo", "player").Split(',');
-        flag = data.String("flag");
-        flagIf = data.String("flagIf");
-        maxRangeSq = data.Float("maxRange");
+        flag = data.String("flag", "");
+        flagIf = data.String("flagIf", "");
+        maxRangeSq = data.Float("maxRange", 60f);
         maxRangeSq *= maxRangeSq;
-        solids = data.Bool("solids");
-        lightBlockers = data.Bool("lightBlockers");
+        solids = data.Bool("solids", true);
+        lightBlockers = data.Bool("lightBlockers", true);
         drawSprite = data.Bool("drawSprite", true);
 
         if (!string.IsNullOrEmpty(flagIf))
