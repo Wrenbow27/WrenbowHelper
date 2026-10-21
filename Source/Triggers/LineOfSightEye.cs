@@ -207,7 +207,8 @@ public class LineOfSightEye : Entity
 
         if (active)
         { // has valid settings
-            if (!(hasFlag && !SceneAs<Level>().Session.GetFlag(flagIf)))
+            Session session = SceneAs<Level>().Session;
+            if (!(hasFlag && !session.GetFlag(flagIf)))
             { // not being disabled via flag
                 Vector2 pos1 = entityFrom.Center;
                 float? minDistSq = null;
@@ -220,7 +221,7 @@ public class LineOfSightEye : Entity
                     if ( distanceSq <= maxRangeSq)
                     { // entity in range
                         anyInRange = true;
-                        if (solids && CollideCheckSolids(pos1, pos2))
+                        if (solids && CollideCheckSolids(pos1, pos2, entityTo))
                         {
                             continue;
                         }
@@ -228,26 +229,33 @@ public class LineOfSightEye : Entity
                         {
                             continue;
                         }
-                        
+
                         // line of sight found
                         if (minDistSq is null || (float)minDistSq > distanceSq)
                         {
                             minDistSq = distanceSq;
                             closest = entityTo;
+                            if (!drawSprite) // no need to find the best look target if it doesn't need to be drawn
+                            {
+                                break;
+                            }
                         }
                     }
                 }
 
-                if (closest is not null) // has any non null or non zero values
+                bool foundEntity = closest is not null;
+                session.SetFlag(flag, foundEntity);
+
+                if (drawSprite)
                 {
-                    SceneAs<Level>().Session.SetFlag(flag, true);
-                    MovePupil(closest.Center - entityFrom.Center);
-                    OpenEye();
-                }
-                else
-                {
-                    SceneAs<Level>().Session.SetFlag(flag, false);
-                    MovePupil(Vector2.Zero);
+                    if (foundEntity){
+                        MovePupil(closest.Center - pos1);
+                    }
+                    else
+                    {
+                        MovePupil(Vector2.Zero);
+                    }
+
                     if (anyInRange)
                     {
                         OpenEye();
@@ -260,14 +268,17 @@ public class LineOfSightEye : Entity
             }
             else
             { // being disabled via flag
-                SceneAs<Level>().Session.SetFlag(flag, false);
-                MovePupil(Vector2.Zero);
-                CloseEye();
+                session.SetFlag(flag, false);
+                if (drawSprite)
+                {
+                    MovePupil(Vector2.Zero);
+                    CloseEye();
+                }
             }
         }
     }
 
-    private bool CollideCheckSolids(Vector2 from, Vector2 to)
+    private bool CollideCheckSolids(Vector2 from, Vector2 to, Entity thisEntityTo)
     {
         if (cheapCheck)
         {
@@ -275,7 +286,7 @@ public class LineOfSightEye : Entity
         } else {
             foreach (Solid solid in Scene.CollideAll<Solid>(from, to))
             {
-                if (solid != entityFrom && !entitiesTo.Contains(solid))
+                if (solid != entityFrom && solid != thisEntityTo)
                 {
                     return true;
                 }
@@ -317,7 +328,7 @@ public class LineOfSightEye : Entity
 
     private void OpenEye()
     {
-        if (drawSprite && !wasOpen)
+        if (!wasOpen)
         {
             wasOpen = true;
             eyelid.Play("opening");
@@ -327,7 +338,7 @@ public class LineOfSightEye : Entity
 
     private void CloseEye()
     {
-        if (drawSprite && wasOpen)
+        if (wasOpen)
         {
             wasOpen = false;
             eyelid.Play("closing");

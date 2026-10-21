@@ -69,4 +69,11 @@ function lineOfSightEye.sprite(room, entity)
     return sprites
 end
 
+function lineOfSightEye.drawSelected(room, layer, entity)
+    love.graphics.setColor(1, 1, 1, 0.5)
+    love.graphics.circle("line", entity.x, entity.y, entity.maxRange or 60, 64)
+    love.graphics.setColor(1, 1, 1, 1)
+    return
+end
+
 return lineOfSightEye
