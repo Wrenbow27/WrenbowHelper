@@ -14,7 +14,6 @@ This works by refunding the coyote time of a jump/hyper/super if it was done usi
 While a dream jump is "stored" like this, the flag WrenbowHelper_HasDreamJump is held as true to help enable custom behaviors
 
 Bluetooth refill:
-Requested by jantheguy
 A refill that can also be collected by holdables
 
 Set LiftSpeed trigger:
@@ -28,8 +27,11 @@ A colorblind mode is provided under Mod Settings
 Yes, I know that nobody asked for this. ANd yes, I do think it's funny
 
 Feather Controller:
-Requested by Ivory and Bartholomew
 Adds various settings to adjust feather state, including speeds, color, and much more
+
+Line of sight eye
+Has settings to track whether it has line of sight to an arbitrary entity
+Can also use an arbitrary entity as the source, and can look for more than one entity
 
 -Credits-
 
